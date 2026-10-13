@@ -228,10 +228,10 @@ def display_roster(sav_data, slot_info):
             race = RACE_NAMES[race_id]
             job_name = JOB_NAMES.get(job_id, (f"Job#{job_id:02x}", race))[0]
 
-            # Abilities count
+            # Abilities count (mastered abilities have bit 7 set in vanilla saves)
             spec = RACE_ABILITY_SPECS.get(race_id, (80, 0, False))
             max_ab = spec[0]
-            learned = sum(1 for b in ub[0x41 : 0x41 + max_ab] if b == 0xE4)
+            learned = sum(1 for b in ub[0x41 : 0x41 + max_ab] if (b & 0x80) != 0)
 
             # Advanced jobs unlocked check
             counters = ub[0xF1:0x106]
@@ -307,7 +307,7 @@ def patch_clan_units(sav_data, target_slot=1, target_unit=None):
             race_name = RACE_NAMES.get(race_id, "Unknown")
 
             # Check if unit is already fully patched
-            already_abilities = all(sav_data[u_addr + 0x41 + i] == 0xE4 for i in range(count))
+            already_abilities = all((sav_data[u_addr + 0x41 + i] & 0x80) != 0 for i in range(count))
             already_jobs = sav_data[u_addr + 0xF1 : u_addr + 0x106] == RACE_JOB_COUNTERS.get(race_id, b"")
             if already_abilities and already_jobs:
                 print(f"  [-] Unit {u} ({race_name}, Lv {level}): Already fully patched, skipping.")
