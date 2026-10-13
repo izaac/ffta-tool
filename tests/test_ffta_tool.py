@@ -263,10 +263,13 @@ class TestFftaTool(unittest.TestCase):
         self.assertEqual(get_item_name(0x00CC), "Conch Shell")
         self.assertEqual(get_item_name(0x00FD), "Bronze Shield")
         self.assertEqual(get_item_name(0x00FE), "Round Shield")
+        self.assertEqual(get_item_name(0x0114), "Ribbon")
         self.assertEqual(get_item_name(0x0115), "Feather Cap")
         self.assertEqual(get_item_name(0x0117), "Green Beret")
+        self.assertEqual(get_item_name(0x011B), "Thief Hat")
         self.assertEqual(get_item_name(0x0122), "Iron Armor")
         self.assertEqual(get_item_name(0x0132), "Survival Vest")
+        self.assertEqual(get_item_name(0x0138), "Ninja Gear")
 
 
 if __name__ == "__main__":
