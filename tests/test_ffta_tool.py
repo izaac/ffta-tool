@@ -252,6 +252,22 @@ class TestFftaTool(unittest.TestCase):
             self.assertTrue(os.path.exists(backup_file), "Backup file must exist")
             self.assertEqual(os.path.getsize(backup_file), len(self.mock_data))
 
+    def test_item_resolution(self):
+        """Verifies KNOWN_ITEMS resolves equipment names accurately."""
+        from ffta_tool import get_item_name
+        self.assertEqual(get_item_name(0), "-")
+        self.assertEqual(get_item_name(0x0029), "Apocalypse")
+        self.assertEqual(get_item_name(0x005C), "Flamberge")
+        self.assertEqual(get_item_name(0x0086), "Dream Watcher")
+        self.assertEqual(get_item_name(0x0088), "Firewheel Rod")
+        self.assertEqual(get_item_name(0x00CC), "Conch Shell")
+        self.assertEqual(get_item_name(0x00FD), "Bronze Shield")
+        self.assertEqual(get_item_name(0x00FE), "Round Shield")
+        self.assertEqual(get_item_name(0x0115), "Feather Cap")
+        self.assertEqual(get_item_name(0x0117), "Green Beret")
+        self.assertEqual(get_item_name(0x0122), "Iron Armor")
+        self.assertEqual(get_item_name(0x0132), "Survival Vest")
+
 
 if __name__ == "__main__":
     unittest.main()
