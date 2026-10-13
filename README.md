@@ -84,6 +84,20 @@ A pristine demonstration save file is included in `examples/FFTA_Super_Starter.s
 
 ---
 
+## ROM Compatibility & Verification
+
+Tested and verified against the standard No-Intro release:
+
+| Field | Value |
+|---|---|
+| **Release** | Final Fantasy Tactics Advance (USA, Australia) |
+| **Serial / Product ID** | `AGB-AFXE-USA` |
+| **MD5** | `cd99cdde3d45554c1b36fbeb8863b7bd` |
+| **SHA-1** | `4ac05441f4de70a4ec3dd932116346c61b8783d9` |
+| **CRC32** | `5645e56c` |
+
+---
+
 ## Testing & Development
 
 Run built-in tests:
