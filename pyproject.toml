@@ -23,6 +23,9 @@ classifiers = [
 [project.scripts]
 ffta-tool = "ffta_tool:main"
 
+[tool.setuptools]
+py-modules = ["ffta_tool", "mappings"]
+
 [tool.ruff]
 line-length = 120
 target-version = "py310"

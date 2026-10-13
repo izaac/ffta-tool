@@ -6,28 +6,41 @@ Zero external dependencies required. Built purely with the standard Python libra
 
 ---
 
-## Installation
+## Quick Start (with `uv`)
 
-Works on **any Linux, macOS, or Windows** system with Python 3.10+:
-
-### Quick Install (Pip)
-
-Install locally to add the `ffta-tool` command to your environment:
+Run instantly without installing or touching system Python:
 
 ```bash
 git clone https://github.com/izaac/ffta-tool.git
 cd ffta-tool
-pip install -e .
+uv run ffta-tool
 ```
 
-### Standalone (No Install)
+Or install as an isolated CLI command into user space:
+
+```bash
+uv tool install .
+ffta-tool
+```
+
+---
+
+## Standalone (No `uv`)
+
+Works on **any Linux, macOS, or Windows** system with Python 3.10+:
+
+### Linux & macOS
 
 ```bash
 chmod +x ffta_tool.py
 ./ffta_tool.py
 ```
 
-On Windows, install [Python 3](https://www.python.org/downloads/) (check *"Add Python to PATH"*), open Command Prompt in the folder, and run:
+### Windows
+
+1. Download and install [Python 3](https://www.python.org/downloads/) (check *"Add Python to PATH"* during install).
+2. Clone or download this repository.
+3. Open Command Prompt or PowerShell in the folder:
 
 ```powershell
 python ffta_tool.py
@@ -37,7 +50,7 @@ python ffta_tool.py
 
 ## Usage
 
-You can use either `ffta-tool` or `python3 ffta_tool.py`:
+You can use either `ffta-tool` (via uv) or `./ffta_tool.py`:
 
 ```bash
 # 1. View Clan Roster & Save Health (Auto-detects SD card or local save)
@@ -72,18 +85,18 @@ A pristine demonstration save file is included in `examples/FFTA_Super_Starter.s
 
 ---
 
-## Testing & Linting
+## Testing & Development
 
 Run built-in tests:
 
 ```bash
-python3 -m unittest discover -s tests
+uv run python -m unittest discover -s tests
 ```
 
 Check code style with Ruff:
 
 ```bash
-ruff check && ruff format --check
+uvx ruff check && uvx ruff format --check
 ```
 
 ---
