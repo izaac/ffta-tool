@@ -78,9 +78,8 @@ ffta-tool path/to/save.sav --fix-crc --slot 2
 
 A pristine demonstration save file is included in `examples/FFTA_Super_Starter.sav`:
 
-- **Slot 1 & Slot 2**: Clean Cyril starter pub state with 0 missions cleared.
-- **Roster**: 6 starting recruits with all skills mastered and valid job unlock tables.
-- **Inventory**: 10x all 361 weapons and equipment, 99x all consumables.
+- **Slot 1 (Vanilla Starter)**: 100% clean Cyril starter state, 0 missions cleared, default starter recruits, equipment, and abilities.
+- **Slot 2 (Super Starter)**: Clean Cyril starter state, 0 missions cleared, 10x all 361 weapons and gear, 99x consumables, and all starting recruit abilities mastered.
 - **Checksums**: Fully verified internal CRC32 on both slots.
 
 ---
