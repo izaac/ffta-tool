@@ -303,6 +303,7 @@ class TestFftaTool(unittest.TestCase):
         self.assertEqual(get_item_name(0x002F), "Excalibur")
         self.assertEqual(get_item_name(0x0031), "Excalibur 2")
         self.assertEqual(get_item_name(0x005C), "Flamberge")
+        self.assertEqual(get_item_name(0x0079), "White Staff")
         self.assertEqual(get_item_name(0x0086), "Dream Watcher")
         self.assertEqual(get_item_name(0x0088), "Firewheel Rod")
         self.assertEqual(get_item_name(0x009D), "Scorpion Tail")
@@ -315,8 +316,10 @@ class TestFftaTool(unittest.TestCase):
         self.assertEqual(get_item_name(0x0117), "Green Beret")
         self.assertEqual(get_item_name(0x011B), "Thief Hat")
         self.assertEqual(get_item_name(0x0122), "Iron Armor")
+        self.assertEqual(get_item_name(0x012F), "Leather Garb")
         self.assertEqual(get_item_name(0x0132), "Survival Vest")
         self.assertEqual(get_item_name(0x0138), "Ninja Gear")
+        self.assertEqual(get_item_name(0x0143), "Hempen Robe")
 
     def test_mappings_module(self):
         """Verifies modular mappings export expected tables and lengths."""
@@ -330,6 +333,22 @@ class TestFftaTool(unittest.TestCase):
         self.assertEqual(len(mappings.EQUIPMENT_IDS), 361)
         self.assertEqual(len(mappings.CONSUMABLE_IDS), 14)
         self.assertIn("KNOWN_ITEMS", mappings.__all__)
+
+    def test_example_super_starter_save(self):
+        """Verifies packaged example Super Starter save file integrity."""
+        example_path = os.path.join(os.path.dirname(__file__), "..", "examples", "FFTA_Super_Starter.sav")
+        self.assertTrue(os.path.exists(example_path), "Example save file must exist")
+
+        with open(example_path, "rb") as f:
+            data = f.read()
+
+        slots = get_slots(data)
+        self.assertIn(0, slots, "Slot 1 must exist")
+        self.assertIn(1, slots, "Slot 2 must exist")
+        self.assertTrue(slots[0]["valid"], "Slot 1 CRC must be valid")
+        self.assertTrue(slots[1]["valid"], "Slot 2 CRC must be valid")
+        self.assertEqual(slots[0]["missions"], 0, "Slot 1 missions must be 0")
+        self.assertEqual(slots[1]["missions"], 0, "Slot 2 missions must be 0")
 
 
 if __name__ == "__main__":

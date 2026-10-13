@@ -235,7 +235,7 @@ def display_roster(sav_data, slot_info):
 
             # Advanced jobs unlocked check
             counters = ub[0xF1:0x106]
-            is_unlocked = any(counters)
+            is_unlocked = counters == RACE_JOB_COUNTERS.get(race_id, b"") or (learned > 0 and learned == max_ab)
 
             # Equipment
             gear_ids = struct.unpack("<5H", ub[0x2A:0x34])

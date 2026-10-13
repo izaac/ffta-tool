@@ -104,6 +104,7 @@ KNOWN_ITEMS: dict[int, str] = {
     0x0073: "Masamune",
     0x0076: "Masamune 100",
     # Staves & Rods
+    0x0079: "White Staff",
     0x0085: "Power Staff",
     0x0086: "Dream Watcher",
     0x0087: "Rod",
@@ -172,6 +173,7 @@ KNOWN_ITEMS: dict[int, str] = {
     0x0122: "Iron Armor",
     0x0123: "Platemail",
     0x0124: "Gold Armor",
+    0x012F: "Leather Garb",
     0x0130: "Chain Plate",
     0x0131: "Adaman Vest",
     0x0132: "Survival Vest",
@@ -180,6 +182,7 @@ KNOWN_ITEMS: dict[int, str] = {
     0x0138: "Ninja Gear",
     0x0139: "Dark Gear",
     # Robes
+    0x0143: "Hempen Robe",
     0x0147: "Blaze Robe",
     0x014B: "Black Robe",
     0x014C: "Light Robe",
