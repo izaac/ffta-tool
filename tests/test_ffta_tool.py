@@ -256,7 +256,9 @@ class TestFftaTool(unittest.TestCase):
         """Verifies KNOWN_ITEMS resolves equipment names accurately."""
         from ffta_tool import get_item_name
         self.assertEqual(get_item_name(0), "-")
+        self.assertEqual(get_item_name(0x0026), "Tulwar")
         self.assertEqual(get_item_name(0x0029), "Apocalypse")
+        self.assertEqual(get_item_name(0x0031), "Excalibur")
         self.assertEqual(get_item_name(0x005C), "Flamberge")
         self.assertEqual(get_item_name(0x0086), "Dream Watcher")
         self.assertEqual(get_item_name(0x0088), "Firewheel Rod")
