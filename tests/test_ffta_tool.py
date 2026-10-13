@@ -260,6 +260,20 @@ class TestFftaTool(unittest.TestCase):
         self.assertEqual(c1_id, 0x16A)
         self.assertEqual(c1_qty, 99)
 
+    def test_super_starter_safety_check_blocks_active_missions(self):
+        """Verifies super_starter blocks saves with cleared missions unless force=True."""
+        buf = bytearray(self.mock_data)
+        # Slot 1 in mock_data has 5 missions cleared
+        with self.assertRaises(ValueError) as ctx:
+            patch_super_starter(buf, target_slot=0)
+        self.assertIn("Pass --force to override", str(ctx.exception))
+
+        # With force=True, patching succeeds and resets missions to 0
+        patched = patch_super_starter(buf, target_slot=0, force=True)
+        slots = get_slots(patched)
+        self.assertEqual(slots[0]["missions"], 0)
+        self.assertTrue(slots[0]["valid"])
+
     def test_fix_crc_repairs_corrupted_checksum(self):
         """Verifies fix_crc corrects a corrupt CRC byte."""
         buf = bytearray(self.mock_data)

@@ -392,13 +392,19 @@ def clear_clan_cards(sav_data, target_slot=1):
     return sav_data
 
 
-def patch_super_starter(sav_data, target_slot=1, equip_qty=10, item_qty=99, counter_bump=50):
+def patch_super_starter(sav_data, target_slot=1, equip_qty=10, item_qty=99, counter_bump=50, force=False):
     """Applies the complete Super Starter patch to the specified slot."""
     slots = get_slots(sav_data)
     if target_slot not in slots:
         raise ValueError(f"Slot {target_slot + 1} not found in save file!")
 
     info = slots[target_slot]
+    if info["missions"] > 0 and not force:
+        raise ValueError(
+            f"Slot {target_slot + 1} has {info['missions']} missions cleared. "
+            "Super Starter resets story to 0 and overwrites inventory. Pass --force to override."
+        )
+
     secs = info["sectors"]
     hdr_sec, sec1 = secs[0], secs[1]
     hdr_offset = hdr_sec * SECTOR_SIZE
@@ -549,6 +555,12 @@ Examples:
         action="store_true",
         help="Disable automatic pre-patch snapshot backups",
     )
+    parser.add_argument(
+        "-f",
+        "--force",
+        action="store_true",
+        help="Force patch even if save has cleared missions or story progress",
+    )
     parser.add_argument("-o", "--output", help="Output path (default: overwrite input file atomically)")
 
     args = parser.parse_args()
@@ -612,6 +624,7 @@ Examples:
             target_slot=target_slot,
             equip_qty=args.equip_qty,
             item_qty=args.item_qty,
+            force=args.force,
         )
 
     if args.clear_cards and not args.patch_units and not args.super_starter:

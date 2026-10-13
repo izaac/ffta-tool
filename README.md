@@ -75,6 +75,8 @@ ffta-tool --clear-cards --slot 2
 ffta-tool path/to/save.sav --fix-crc --slot 2
 ```
 
+> **Safety Guard**: `--super-starter` resets mission progress to 0 and overwrites bag inventory. Saves with cleared missions are blocked automatically unless `-f` / `--force` is provided.
+
 ---
 
 ## Example Starter Save
