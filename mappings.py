@@ -211,11 +211,11 @@ RACE_ABILITY_SPECS: dict[int, tuple[int, int, bool]] = {
 
 # Cache byte array at unit + 0xF1..0x106 used by the Job change menu
 RACE_JOB_COUNTERS: dict[int, bytes] = {
-    1: bytes.fromhex("ff 0c 00 00 00 02 05 02 02 05 06 01 02 03 fc 00 02 00 03 02 00"),
+    1: bytes.fromhex("ff 0c 00 00 00 02 05 02 02 05 06 01 02 03 fc 00 02 00 00 02 00"),
     2: bytes.fromhex("0e 02 00 00 00 0a 07 01 00 00 09 01 02 02 fd 00 01 00 00 03 00"),
     3: bytes.fromhex("6b 18 00 00 00 07 02 01 00 00 0a 01 02 04 fb 00 01 00 00 01 00"),
-    4: bytes.fromhex("ff 10 00 00 00 07 07 03 00 00 0b 01 02 04 fb 00 02 00 01 00 00"),
-    5: bytes.fromhex("37 07 00 00 00 0a 02 01 04 01 07 01 02 02 fd 00 01 00 02 05 00"),
+    4: bytes.fromhex("ff 10 00 00 00 07 07 03 00 00 0b 01 02 04 fb 00 02 00 00 00 00"),
+    5: bytes.fromhex("37 07 00 00 00 0a 02 01 04 01 07 01 02 02 fd 00 01 00 00 05 00"),
 }
 
 EQUIPMENT_IDS: list[int] = list(range(1, 0x16A))

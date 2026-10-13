@@ -246,6 +246,16 @@ def display_roster(sav_data, slot_info):
             if 0x0114 in gear_ids and w1 != 0x0114 and w2 != 0x0114:
                 eq_str += " [Ribbon]"
 
+            red_cards = ub[0x102]
+            yellow_cards = ub[0x103]
+            if red_cards > 0 or yellow_cards > 0:
+                card_strs = []
+                if yellow_cards > 0:
+                    card_strs.append(f"{yellow_cards}Y")
+                if red_cards > 0:
+                    card_strs.append(f"{red_cards}R")
+                eq_str += f" [Cards: {'/'.join(card_strs)}]"
+
             units.append(
                 {
                     "idx": u,
@@ -327,6 +337,10 @@ def patch_clan_units(sav_data, target_slot=1, target_unit=None):
             if race_id in RACE_JOB_COUNTERS:
                 sav_data[u_addr + 0xF1 : u_addr + 0x106] = RACE_JOB_COUNTERS[race_id]
 
+            # Clear yellow and red cards
+            sav_data[u_addr + 0x102] = 0
+            sav_data[u_addr + 0x103] = 0
+
             print(f"  [+] Unit {u} ({race_name}, Lv {level}): Mastered all {count} skills + unlocked advanced jobs.")
             patched_count += 1
 
@@ -339,6 +353,40 @@ def patch_clan_units(sav_data, target_slot=1, target_unit=None):
     sav_data[hdr_offset + 0x0C : hdr_offset + 0x10] = struct.pack("<I", new_crc)
 
     print(f"\n  [+] Successfully patched {patched_count} clan units.")
+    print(f"  [+] Sequence counter incremented to: {new_counter}")
+    print(f"  [+] Checksum updated: {hex(new_crc)}")
+    return sav_data
+
+
+def clear_clan_cards(sav_data, target_slot=1):
+    """Zeroes out all red and yellow cards for units in the target slot."""
+    slots = get_slots(sav_data)
+    if target_slot not in slots:
+        raise ValueError(f"Slot {target_slot + 1} not found!")
+
+    info = slots[target_slot]
+    secs = info["sectors"]
+    hdr_sec = secs[0]
+    hdr_offset = hdr_sec * SECTOR_SIZE
+
+    cleared = 0
+    for u in range(24):
+        u_addr = hdr_offset + 0x80 + u * 0x108
+        if u_addr + 0x108 > len(sav_data):
+            break
+        level = sav_data[u_addr + 0x09]
+        if level > 0:
+            if sav_data[u_addr + 0x102] > 0 or sav_data[u_addr + 0x103] > 0:
+                cleared += 1
+            sav_data[u_addr + 0x102] = 0  # Red Cards
+            sav_data[u_addr + 0x103] = 0  # Yellow Cards
+
+    new_counter = info["counter"] + 1
+    sav_data[hdr_offset + 8 : hdr_offset + 12] = struct.pack("<I", new_counter)
+    new_crc = compute_crc(sav_data, secs)
+    sav_data[hdr_offset + 0x0C : hdr_offset + 0x10] = struct.pack("<I", new_crc)
+
+    print(f"  [+] Cleared all yellow and red cards for {cleared} units.")
     print(f"  [+] Sequence counter incremented to: {new_counter}")
     print(f"  [+] Checksum updated: {hex(new_crc)}")
     return sav_data
@@ -467,6 +515,12 @@ Examples:
         help="Create a timestamped snapshot backup without changes",
     )
     parser.add_argument(
+        "-c",
+        "--clear-cards",
+        action="store_true",
+        help="Clear all yellow and red cards for clan members",
+    )
+    parser.add_argument(
         "--fix-crc",
         action="store_true",
         help="Recalculate and write valid CRC checksum",
@@ -528,7 +582,7 @@ Examples:
     target_slot = args.slot - 1
 
     # Default action: Inspect
-    is_modifying = args.patch_units or args.super_starter or args.fix_crc
+    is_modifying = args.patch_units or args.super_starter or args.clear_cards or args.fix_crc
     if not is_modifying or args.inspect:
         inspect_save(data, show_roster=True)
         if not is_modifying:
@@ -536,7 +590,15 @@ Examples:
 
     # Automatic snapshot backup before modification
     if not args.no_backup:
-        action_name = "super_starter" if args.super_starter else "patch_units" if args.patch_units else "crc_fix"
+        action_name = (
+            "super_starter"
+            if args.super_starter
+            else "patch_units"
+            if args.patch_units
+            else "clear_cards"
+            if args.clear_cards
+            else "crc_fix"
+        )
         b_path = create_snapshot_backup(target_path, action_name)
         print(f"[*] Created pre-patch snapshot backup: {b_path}")
 
@@ -552,7 +614,10 @@ Examples:
             item_qty=args.item_qty,
         )
 
-    if args.fix_crc and not args.patch_units and not args.super_starter:
+    if args.clear_cards and not args.patch_units and not args.super_starter:
+        data = clear_clan_cards(data, target_slot=target_slot)
+
+    if args.fix_crc and not args.patch_units and not args.super_starter and not args.clear_cards:
         data = fix_crc(data, target_slot=target_slot)
 
     # Atomic write

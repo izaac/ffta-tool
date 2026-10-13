@@ -68,7 +68,10 @@ ffta-tool --backup
 # 5. Apply Super Starter package (10x all 361 weapons & 99x consumables)
 ffta-tool --super-starter --slot 2
 
-# 6. Fix corrupt save checksum (CRC32)
+# 6. Clear all yellow and red cards for clan members
+ffta-tool --clear-cards --slot 2
+
+# 7. Fix corrupt save checksum (CRC32)
 ffta-tool path/to/save.sav --fix-crc --slot 2
 ```
 

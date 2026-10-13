@@ -17,6 +17,7 @@ from ffta_tool import (
     RACE_JOB_COUNTERS,
     SECTOR_SIZE,
     atomic_write,
+    clear_clan_cards,
     compute_crc,
     create_snapshot_backup,
     fix_crc,
@@ -271,6 +272,26 @@ class TestFftaTool(unittest.TestCase):
         fixed = fix_crc(buf, target_slot=0)
         slots_after = get_slots(fixed)
         self.assertTrue(slots_after[0]["valid"], "Slot 1 CRC should be repaired")
+
+    def test_clear_clan_cards(self):
+        """Verifies clear_clan_cards zeroes out all red and yellow cards."""
+        buf = bytearray(self.mock_data)
+        s4_off = 4 * SECTOR_SIZE
+
+        # Set fake cards on Unit 0 and Unit 1 in Slot 2
+        u0_off = s4_off + 0x80 + 0 * 0x108
+        u1_off = s4_off + 0x80 + 1 * 0x108
+        buf[u0_off + 0x102] = 1  # 1 Red Card
+        buf[u0_off + 0x103] = 3  # 3 Yellow Cards
+        buf[u1_off + 0x103] = 2  # 2 Yellow Cards
+
+        cleared = clear_clan_cards(buf, target_slot=1)
+        slots = get_slots(cleared)
+        self.assertTrue(slots[1]["valid"], "CRC must be valid after card clearing")
+        self.assertEqual(cleared[u0_off + 0x102], 0, "Red cards cleared")
+        self.assertEqual(cleared[u0_off + 0x103], 0, "Yellow cards cleared")
+        self.assertEqual(cleared[u1_off + 0x102], 0, "Red cards cleared")
+        self.assertEqual(cleared[u1_off + 0x103], 0, "Yellow cards cleared")
 
     def test_atomic_write_and_snapshot_backup(self):
         """Verifies atomic_write and snapshot backup behavior."""
