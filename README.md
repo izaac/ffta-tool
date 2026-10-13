@@ -8,23 +8,26 @@ Zero external dependencies required. Built purely with the standard Python libra
 
 ## Installation
 
-Works on **any Linux, macOS, or Windows** system with Python 3.8+:
+Works on **any Linux, macOS, or Windows** system with Python 3.10+:
 
-### Linux & macOS
+### Quick Install (Pip)
+
+Install locally to add the `ffta-tool` command to your environment:
 
 ```bash
 git clone https://github.com/izaac/ffta-tool.git
 cd ffta-tool
-chmod +x ffta_tool.py
+pip install -e .
 ```
 
-*(Optional: Copy to `~/.local/bin/ffta-tool` to run from anywhere).*
+### Standalone (No Install)
 
-### Windows
+```bash
+chmod +x ffta_tool.py
+./ffta_tool.py
+```
 
-1. Download and install [Python 3](https://www.python.org/downloads/) (check the box: *"Add Python to PATH"* during install).
-2. Clone or download this repository.
-3. Open Command Prompt or PowerShell in the folder:
+On Windows, install [Python 3](https://www.python.org/downloads/) (check *"Add Python to PATH"*), open Command Prompt in the folder, and run:
 
 ```powershell
 python ffta_tool.py
@@ -34,31 +37,53 @@ python ffta_tool.py
 
 ## Usage
 
+You can use either `ffta-tool` or `python3 ffta_tool.py`:
+
 ```bash
 # 1. View Clan Roster & Save Health (Auto-detects SD card or local save)
-python3 ffta_tool.py
+ffta-tool
 
-# 2. Master skills & unlock advanced jobs for new recruits (e.g. Juggler, Gunner)
-python3 ffta_tool.py --patch-units
+# 2. Master skills & unlock advanced jobs for all clan recruits
+ffta-tool --patch-units
 
-# 3. Create an instant timestamped backup
-python3 ffta_tool.py --backup
+# 3. Target a single recruit by unit index (0..23)
+ffta-tool --patch-units --unit 5
 
-# 4. Super Starter: 10x all 361 weapons & 99x consumables on Slot 2
-python3 ffta_tool.py --super-starter --slot 2
+# 4. Create an instant timestamped backup
+ffta-tool --backup
 
-# 5. Fix corrupt save checksum (CRC32)
-python3 ffta_tool.py path/to/save.sav --fix-crc --slot 2
+# 5. Apply Super Starter package (10x all 361 weapons & 99x consumables)
+ffta-tool --super-starter --slot 2
+
+# 6. Fix corrupt save checksum (CRC32)
+ffta-tool path/to/save.sav --fix-crc --slot 2
 ```
 
 ---
 
-## Testing
+## Example Starter Save
+
+A pristine demonstration save file is included in `examples/FFTA_Super_Starter.sav`:
+
+- **Slot 1 & Slot 2**: Clean Cyril starter pub state with 0 missions cleared.
+- **Roster**: 6 starting recruits with all skills mastered and valid job unlock tables.
+- **Inventory**: 10x all 361 weapons and equipment, 99x all consumables.
+- **Checksums**: Fully verified internal CRC32 on both slots.
+
+---
+
+## Testing & Linting
 
 Run built-in tests:
 
 ```bash
 python3 -m unittest discover -s tests
+```
+
+Check code style with Ruff:
+
+```bash
+ruff check && ruff format --check
 ```
 
 ---
