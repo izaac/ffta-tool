@@ -263,6 +263,8 @@ class TestFftaTool(unittest.TestCase):
         self.assertEqual(get_item_name(0x005C), "Flamberge")
         self.assertEqual(get_item_name(0x0086), "Dream Watcher")
         self.assertEqual(get_item_name(0x0088), "Firewheel Rod")
+        self.assertEqual(get_item_name(0x009D), "Scorpion Tail")
+        self.assertEqual(get_item_name(0x009E), "Zeus Mace")
         self.assertEqual(get_item_name(0x00CC), "Conch Shell")
         self.assertEqual(get_item_name(0x00FD), "Bronze Shield")
         self.assertEqual(get_item_name(0x00FE), "Round Shield")
