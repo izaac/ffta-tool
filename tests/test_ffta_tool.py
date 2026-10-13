@@ -318,6 +318,19 @@ class TestFftaTool(unittest.TestCase):
         self.assertEqual(get_item_name(0x0132), "Survival Vest")
         self.assertEqual(get_item_name(0x0138), "Ninja Gear")
 
+    def test_mappings_module(self):
+        """Verifies modular mappings export expected tables and lengths."""
+        import mappings
+
+        self.assertEqual(len(mappings.RACE_NAMES), 5)
+        self.assertIn(1, mappings.RACE_NAMES)
+        self.assertEqual(mappings.RACE_NAMES[1], "Hume")
+        self.assertEqual(mappings.JOB_NAMES[0x01], ("Soldier", "Hume"))
+        self.assertEqual(mappings.JOB_NAMES[0x21], ("Archer", "Viera"))
+        self.assertEqual(len(mappings.EQUIPMENT_IDS), 361)
+        self.assertEqual(len(mappings.CONSUMABLE_IDS), 14)
+        self.assertIn("KNOWN_ITEMS", mappings.__all__)
+
 
 if __name__ == "__main__":
     unittest.main()

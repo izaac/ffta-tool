@@ -1,3 +1,28 @@
+[build-system]
+requires = ["setuptools>=61.0"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "ffta-tool"
+version = "0.1.0"
+description = "Final Fantasy Tactics Advance (GBA) Save Diagnostic and Patching CLI"
+readme = "README.md"
+requires-python = ">=3.10"
+license = { text = "MIT" }
+authors = [
+    { name = "Izaac Zavaleta", email = "izaac@linux.com" },
+]
+classifiers = [
+    "Programming Language :: Python :: 3",
+    "License :: OSI Approved :: MIT License",
+    "Operating System :: OS Independent",
+    "Environment :: Console",
+    "Topic :: Games/Entertainment",
+]
+
+[project.scripts]
+ffta-tool = "ffta_tool:main"
+
 [tool.ruff]
 line-length = 120
 target-version = "py310"
