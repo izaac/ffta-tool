@@ -55,8 +55,8 @@ def create_mock_save():
     for idx, (race, job) in enumerate(races_and_jobs):
         u_off = s4_off + 0x80 + idx * 0x108
         buf[u_off + 0x06] = race   # Race ID
-        buf[u_off + 0x07] = 5      # Level
-        buf[u_off + 0x01] = job    # Job ID
+        buf[u_off + 0x07] = job    # Job ID
+        buf[u_off + 0x09] = 5      # Level
         # Mock equipment: Hand 1 = 0x0001, Hand 2 = 0x0110
         buf[u_off + 0x2A : u_off + 0x2E] = struct.pack("<2H", 0x0001, 0x0110)
 

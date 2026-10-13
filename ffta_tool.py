@@ -88,11 +88,11 @@ JOB_NAMES = {
 
     # Viera (0x1C..0x23)
     0x1C: ("Fencer", "Viera"),
-    0x1D: ("Archer", "Viera"),
-    0x1E: ("White Mage", "Viera"),
-    0x1F: ("Red Mage", "Viera"),
-    0x20: ("Elementalist", "Viera"),
-    0x21: ("Summoner", "Viera"),
+    0x1D: ("Elementalist", "Viera"),
+    0x1E: ("Red Mage", "Viera"),
+    0x1F: ("White Mage", "Viera"),
+    0x20: ("Summoner", "Viera"),
+    0x21: ("Archer", "Viera"),
     0x22: ("Assassin", "Viera"),
     0x23: ("Sniper", "Viera"),
 
@@ -110,18 +110,32 @@ JOB_NAMES = {
 # Known signature items for visualizer
 KNOWN_ITEMS = {
     0x0001: "Shortsword",
+    0x0002: "Silver Sword",
+    0x0003: "Buster Sword",
+    0x0004: "Burglar Sword",
+    0x0005: "Gale Sword",
+    0x0006: "Blood Sword",
     0x0009: "Materia Blade",
     0x0012: "Excalibur",
     0x001A: "Restorer",
+    0x0020: "Buster Sword",
     0x0026: "Sequencer",
     0x0031: "Nagrarok",
+    0x004C: "Khukuri",
+    0x004E: "Scramasax",
+    0x0056: "Mythril Knife",
+    0x0057: "Tonberrian",
+    0x0058: "Tiptaptwo",
     0x0076: "Masamune 100",
     0x0087: "Masamune",
     0x009C: "Zeus Mace",
     0x009E: "Scorpion Tail",
+    0x00A2: "Longbow",
     0x00B5: "Seventh Heaven",
     0x00B8: "Gastrophetes",
+    0x00CF: "Silver Bow",
     0x00D7: "Silver Sword",
+    0x00DB: "Partisan",
     0x00F6: "Ayvuir Red",
     0x00F7: "Peacemaker",
     0x0110: "Brint Shield",
@@ -129,6 +143,9 @@ KNOWN_ITEMS = {
     0x011B: "Genji Helm",
     0x011E: "Acacia Hat",
     0x012B: "Thief Hat",
+    0x0130: "Chain Plate",
+    0x0131: "Adaman Vest",
+    0x0133: "Brigandine",
     0x0138: "Ribbon",
     0x014B: "Ninja Gear",
     0x014C: "Wygar",
@@ -313,9 +330,9 @@ def display_roster(sav_data, slot_info):
         if u_off + 0x108 > len(sec0):
             break
         ub = sec0[u_off : u_off + 0x108]
-        level = ub[0x07]
         race_id = ub[0x06]
         job_id = ub[0x07]
+        level = ub[0x09]
 
         # Let's inspect race & job accurately
         if level > 0 and race_id in RACE_NAMES:
@@ -385,8 +402,8 @@ def patch_clan_units(sav_data, target_slot=1, target_unit=None):
         if u_addr + 0x108 > len(sav_data):
             break
 
-        level = sav_data[u_addr + 0x07]
         race_id = sav_data[u_addr + 0x06]
+        level = sav_data[u_addr + 0x09]
 
         if level > 0 and race_id in RACE_ABILITY_SPECS:
             count, blue_magic, morpher = RACE_ABILITY_SPECS[race_id]
