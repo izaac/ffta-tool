@@ -16,15 +16,16 @@ Features:
  - Atomic file replacement with filesystem sync to prevent corruption.
 """
 
-import os
-import sys
-import glob
-import zlib
-import struct
-import shutil
 import argparse
-from pathlib import Path
+import contextlib
+import glob
+import os
+import shutil
+import struct
+import sys
+import zlib
 from datetime import datetime
+from pathlib import Path
 
 # ==============================================================================
 # Constants & Formats
@@ -66,7 +67,6 @@ JOB_NAMES = {
     0x0A: ("Blue Mage", "Hume"),
     0x0B: ("Archer", "Hume"),
     0x0C: ("Hunter", "Hume"),
-
     # Bangaa (0x0D..0x13)
     0x0D: ("Warrior", "Bangaa"),
     0x0E: ("White Monk", "Bangaa"),
@@ -75,7 +75,6 @@ JOB_NAMES = {
     0x11: ("Defender", "Bangaa"),
     0x12: ("Bishop", "Bangaa"),
     0x13: ("Templar", "Bangaa"),
-
     # Nu Mou (0x14..0x1B)
     0x14: ("White Mage", "Nu Mou"),
     0x15: ("Black Mage", "Nu Mou"),
@@ -85,7 +84,6 @@ JOB_NAMES = {
     0x19: ("Beastmaster", "Nu Mou"),
     0x1A: ("Morpher", "Nu Mou"),
     0x1B: ("Sage", "Nu Mou"),
-
     # Viera (0x1C..0x23)
     0x1C: ("Fencer", "Viera"),
     0x1D: ("Elementalist", "Viera"),
@@ -95,7 +93,6 @@ JOB_NAMES = {
     0x21: ("Archer", "Viera"),
     0x22: ("Assassin", "Viera"),
     0x23: ("Sniper", "Viera"),
-
     # Moogle (0x24..0x2B)
     0x24: ("Animist", "Moogle"),
     0x25: ("Mog Knight", "Moogle"),
@@ -224,10 +221,10 @@ KNOWN_ITEMS = {
 # Race ability counts starting at unit + 0x41
 RACE_ABILITY_SPECS = {
     1: (140, 26, False),  # Hume: count, blue_magic, morpher
-    2: (76, 0, False),    # Bangaa
-    3: (94, 0, True),     # Nu Mou: + morpher
-    4: (84, 0, False),    # Viera
-    5: (87, 0, False),    # Moogle
+    2: (76, 0, False),  # Bangaa
+    3: (94, 0, True),  # Nu Mou: + morpher
+    4: (84, 0, False),  # Viera
+    5: (87, 0, False),  # Moogle
 }
 
 # Cache byte array at unit + 0xF1..0x106 used by the Job change menu
@@ -246,6 +243,7 @@ CONSUMABLE_IDS = list(range(0x16A, 0x178))
 # ==============================================================================
 # Save File Operations & CRC32
 # ==============================================================================
+
 
 def compute_crc(sav_data, sectors):
     """Calculates internal FFTA IEEE 802.3 CRC32 checksum over 0x2FC4 buffer."""
@@ -301,11 +299,13 @@ def auto_detect_save():
         home_path = Path(home)
         doc_dir = home_path / "Documents"
         backup_dir = doc_dir / "FFTA_Backups"
-        candidates.extend([
-            str(doc_dir / "FFTA_Save_Slot2_Mastered_Recruits_Juggler.sav"),
-            str(backup_dir / "FFTA_Save_Slot2_Mastered_Recruits_Juggler.sav"),
-            str(backup_dir / "Final_Fantasy_Tactics_Advance_Current_Patched.sav"),
-        ])
+        candidates.extend(
+            [
+                str(doc_dir / "FFTA_Save_Slot2_Mastered_Recruits_Juggler.sav"),
+                str(backup_dir / "FFTA_Save_Slot2_Mastered_Recruits_Juggler.sav"),
+                str(backup_dir / "Final_Fantasy_Tactics_Advance_Current_Patched.sav"),
+            ]
+        )
         if backup_dir.is_dir():
             candidates.extend(glob.glob(str(backup_dir / "*.sav")))
 
@@ -340,15 +340,14 @@ def atomic_write(filepath, data):
         f.flush()
         os.fsync(f.fileno())
     os.replace(tmp_path, filepath)
-    try:
+    with contextlib.suppress(AttributeError):
         os.sync()
-    except AttributeError:
-        pass
 
 
 # ==============================================================================
 # Clan Roster Inspector
 # ==============================================================================
+
 
 def get_item_name(item_id):
     if item_id == 0:
@@ -421,15 +420,17 @@ def display_roster(sav_data, slot_info):
             if 0x0114 in gear_ids and w1 != 0x0114 and w2 != 0x0114:
                 eq_str += " [Ribbon]"
 
-            units.append({
-                "idx": u,
-                "race": race,
-                "job": job_name,
-                "level": level,
-                "learned": f"{learned}/{max_ab}",
-                "unlocked": "YES" if is_unlocked else "NO",
-                "gear": eq_str,
-            })
+            units.append(
+                {
+                    "idx": u,
+                    "race": race,
+                    "job": job_name,
+                    "level": level,
+                    "learned": f"{learned}/{max_ab}",
+                    "unlocked": "YES" if is_unlocked else "NO",
+                    "gear": eq_str,
+                }
+            )
 
     if not units:
         print("      No active clan members found.")
@@ -440,13 +441,18 @@ def display_roster(sav_data, slot_info):
     print("      | #  | Race    | Current Job  | Lv  | Skills  | Adv Jobs | Main Weapons / Key Items   |")
     print("      +----+---------+--------------+-----+---------+----------+----------------------------+")
     for u in units:
-        print(f"      | {u['idx']:<2} | {u['race']:<7} | {u['job']:<12} | {u['level']:<3} | {u['learned']:<7} | {u['unlocked']:<8} | {u['gear']:<26} |")
+        print(
+            f"      | {u['idx']:<2} | {u['race']:<7} | {u['job']:<12} | "
+            f"{u['level']:<3} | {u['learned']:<7} | {u['unlocked']:<8} | "
+            f"{u['gear']:<26} |"
+        )
     print("      +----+---------+--------------+-----+---------+----------+----------------------------+")
 
 
 # ==============================================================================
 # Patching Functions
 # ==============================================================================
+
 
 def patch_clan_units(sav_data, target_slot=1, target_unit=None):
     """Masters abilities and unlocks advanced jobs for recruited clan units."""
@@ -540,23 +546,26 @@ def patch_super_starter(sav_data, target_slot=1, equip_qty=10, item_qty=99, coun
     orig_flags = {}
     for i in range(0x940, 0xEE4, 4):
         addr = sec1_offset + i
-        iid = int.from_bytes(sav_data[addr:addr+2], "little")
+        iid = int.from_bytes(sav_data[addr : addr + 2], "little")
         if iid != 0:
             orig_flags[iid] = sav_data[addr + 3]
 
     for idx, eid in enumerate(EQUIPMENT_IDS):
         addr = sec1_offset + 0x940 + idx * 4
-        sav_data[addr:addr+2] = eid.to_bytes(2, "little")
-        sav_data[addr+2] = equip_qty
-        sav_data[addr+3] = orig_flags.get(eid, 0)
+        sav_data[addr : addr + 2] = eid.to_bytes(2, "little")
+        sav_data[addr + 2] = equip_qty
+        sav_data[addr + 3] = orig_flags.get(eid, 0)
 
     for idx, cid in enumerate(CONSUMABLE_IDS):
         addr = sec1_offset + 0xEE4 + idx * 4
-        sav_data[addr:addr+2] = cid.to_bytes(2, "little")
-        sav_data[addr+2] = item_qty
-        sav_data[addr+3] = 0
+        sav_data[addr : addr + 2] = cid.to_bytes(2, "little")
+        sav_data[addr + 2] = item_qty
+        sav_data[addr + 3] = 0
 
-    print(f"  [+] Injected {len(EQUIPMENT_IDS)} weapons/gear ({equip_qty}x) and {len(CONSUMABLE_IDS)} consumables ({item_qty}x).")
+    print(
+        f"  [+] Injected {len(EQUIPMENT_IDS)} weapons/gear ({equip_qty}x) "
+        f"and {len(CONSUMABLE_IDS)} consumables ({item_qty}x)."
+    )
 
     # 5. Recalculate CRC32
     new_crc = compute_crc(sav_data, secs)
@@ -585,6 +594,7 @@ def fix_crc(sav_data, target_slot=1):
 # CLI Entry Point
 # ==============================================================================
 
+
 def main():
     parser = argparse.ArgumentParser(
         description="Final Fantasy Tactics Advance (GBA) - Save Tool & Clan Manager",
@@ -600,17 +610,65 @@ Examples:
   %(prog)s --fix-crc                      # Recalculate and repair CRC32 checksum
         """,
     )
-    parser.add_argument("save_file", nargs="?", help="Path to FFTA save file (.sav). Auto-detected if omitted.")
-    parser.add_argument("-i", "--inspect", action="store_true", help="Display full save diagnostic & clan roster")
-    parser.add_argument("-p", "--patch-units", action="store_true", help="Master skills & unlock advanced jobs for recruits")
+    parser.add_argument(
+        "save_file",
+        nargs="?",
+        help="Path to FFTA save file (.sav). Auto-detected if omitted.",
+    )
+    parser.add_argument(
+        "-i",
+        "--inspect",
+        action="store_true",
+        help="Display full save diagnostic & clan roster",
+    )
+    parser.add_argument(
+        "-p",
+        "--patch-units",
+        action="store_true",
+        help="Master skills & unlock advanced jobs for recruits",
+    )
     parser.add_argument("-u", "--unit", type=int, help="Target specific unit index (0..23) for patching")
-    parser.add_argument("-s", "--super-starter", action="store_true", help="Apply complete Super Starter patch")
-    parser.add_argument("-b", "--backup", action="store_true", help="Create a timestamped snapshot backup without changes")
-    parser.add_argument("--fix-crc", action="store_true", help="Recalculate and write valid CRC checksum")
-    parser.add_argument("--slot", type=int, default=2, choices=[1, 2], help="Target save slot (1 or 2, default: 2)")
-    parser.add_argument("--equip-qty", type=int, default=10, help="Equipment quantity for Super Starter (default: 10)")
-    parser.add_argument("--item-qty", type=int, default=99, help="Consumable quantity for Super Starter (default: 99)")
-    parser.add_argument("--no-backup", action="store_true", help="Disable automatic pre-patch snapshot backups")
+    parser.add_argument(
+        "-s",
+        "--super-starter",
+        action="store_true",
+        help="Apply complete Super Starter patch",
+    )
+    parser.add_argument(
+        "-b",
+        "--backup",
+        action="store_true",
+        help="Create a timestamped snapshot backup without changes",
+    )
+    parser.add_argument(
+        "--fix-crc",
+        action="store_true",
+        help="Recalculate and write valid CRC checksum",
+    )
+    parser.add_argument(
+        "--slot",
+        type=int,
+        default=2,
+        choices=[1, 2],
+        help="Target save slot (1 or 2, default: 2)",
+    )
+    parser.add_argument(
+        "--equip-qty",
+        type=int,
+        default=10,
+        help="Equipment quantity for Super Starter (default: 10)",
+    )
+    parser.add_argument(
+        "--item-qty",
+        type=int,
+        default=99,
+        help="Consumable quantity for Super Starter (default: 99)",
+    )
+    parser.add_argument(
+        "--no-backup",
+        action="store_true",
+        help="Disable automatic pre-patch snapshot backups",
+    )
     parser.add_argument("-o", "--output", help="Output path (default: overwrite input file atomically)")
 
     args = parser.parse_args()
@@ -622,7 +680,10 @@ Examples:
         if target_path:
             print(f"[*] Auto-detected save: {target_path}")
         else:
-            print("Error: No save file specified and none found in common paths.", file=sys.stderr)
+            print(
+                "Error: No save file specified and none found in common paths.",
+                file=sys.stderr,
+            )
             sys.exit(1)
 
     if not os.path.exists(target_path):

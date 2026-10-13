@@ -4,8 +4,8 @@ Unit tests for Final Fantasy Tactics Advance Save Tool (ffta_tool)
 """
 
 import os
-import sys
 import struct
+import sys
 import tempfile
 import unittest
 
@@ -13,16 +13,16 @@ import unittest
 sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), "..")))
 
 from ffta_tool import (
-    SECTOR_SIZE,
     MAGIC,
     RACE_JOB_COUNTERS,
+    SECTOR_SIZE,
+    atomic_write,
     compute_crc,
+    create_snapshot_backup,
+    fix_crc,
     get_slots,
     patch_clan_units,
     patch_super_starter,
-    fix_crc,
-    create_snapshot_backup,
-    atomic_write,
 )
 
 
@@ -33,7 +33,7 @@ def create_mock_save():
     # Slot 1: Sector 0 header, Seq 10, Sectors [0, 1, 2, 3]
     buf[0:8] = MAGIC
     buf[8:12] = struct.pack("<I", 10)  # Sequence counter
-    buf[0x10] = 0                      # Slot 1
+    buf[0x10] = 0  # Slot 1
     buf[0x12:0x16] = bytes([0, 1, 2, 3])
     buf[0x76:0x78] = struct.pack("<H", 5)  # 5 missions cleared
 
@@ -41,7 +41,7 @@ def create_mock_save():
     s4_off = 4 * SECTOR_SIZE
     buf[s4_off : s4_off + 8] = MAGIC
     buf[s4_off + 8 : s4_off + 12] = struct.pack("<I", 20)  # Sequence counter
-    buf[s4_off + 0x10] = 1                                 # Slot 2
+    buf[s4_off + 0x10] = 1  # Slot 2
     buf[s4_off + 0x12 : s4_off + 0x16] = bytes([4, 5, 6, 7])
     buf[s4_off + 0x76 : s4_off + 0x78] = struct.pack("<H", 0)
 
@@ -54,9 +54,9 @@ def create_mock_save():
     races_and_jobs = [(1, 0x01), (2, 0x0E), (3, 0x14), (4, 0x1C), (5, 0x27)]
     for idx, (race, job) in enumerate(races_and_jobs):
         u_off = s4_off + 0x80 + idx * 0x108
-        buf[u_off + 0x06] = race   # Race ID
-        buf[u_off + 0x07] = job    # Job ID
-        buf[u_off + 0x09] = 5      # Level
+        buf[u_off + 0x06] = race  # Race ID
+        buf[u_off + 0x07] = job  # Job ID
+        buf[u_off + 0x09] = 5  # Level
         # Mock equipment: Hand 1 = 0x0001, Hand 2 = 0x0110
         buf[u_off + 0x2A : u_off + 0x2E] = struct.pack("<2H", 0x0001, 0x0110)
 
@@ -106,14 +106,14 @@ class TestFftaTool(unittest.TestCase):
         s8_off = 8 * SECTOR_SIZE
         buf[s8_off : s8_off + 8] = MAGIC
         buf[s8_off + 8 : s8_off + 12] = struct.pack("<I", 15)  # Older seq
-        buf[s8_off + 0x10] = 1                                 # Slot 2
+        buf[s8_off + 0x10] = 1  # Slot 2
         buf[s8_off + 0x12 : s8_off + 0x16] = bytes([8, 9, 10, 11])
 
         # Write a newer Slot 2 header to sector 12 with seq 50
         s12_off = 12 * SECTOR_SIZE
         buf[s12_off : s12_off + 8] = MAGIC
         buf[s12_off + 8 : s12_off + 12] = struct.pack("<I", 50)  # Newer seq
-        buf[s12_off + 0x10] = 1                                  # Slot 2
+        buf[s12_off + 0x10] = 1  # Slot 2
         buf[s12_off + 0x12 : s12_off + 0x16] = bytes([12, 13, 14, 15])
 
         slots = get_slots(buf)
@@ -134,30 +134,71 @@ class TestFftaTool(unittest.TestCase):
 
         # Check Unit 0 (Hume)
         u0_off = hdr_off + 0x80 + 0 * 0x108
-        self.assertTrue(all(patched[u0_off + 0x41 + i] == 0xE4 for i in range(140)), "Hume abilities mastered")
-        self.assertTrue(all(patched[u0_off + 0x9C + i] == 0xE4 for i in range(26)), "Hume Blue Magic mastered")
-        self.assertEqual(bytes(patched[u0_off + 0xF1 : u0_off + 0x106]), RACE_JOB_COUNTERS[1], "Hume job counters injected")
+        self.assertTrue(
+            all(patched[u0_off + 0x41 + i] == 0xE4 for i in range(140)),
+            "Hume abilities mastered",
+        )
+        self.assertTrue(
+            all(patched[u0_off + 0x9C + i] == 0xE4 for i in range(26)),
+            "Hume Blue Magic mastered",
+        )
+        self.assertEqual(
+            bytes(patched[u0_off + 0xF1 : u0_off + 0x106]),
+            RACE_JOB_COUNTERS[1],
+            "Hume job counters injected",
+        )
 
         # Check Unit 1 (Bangaa)
         u1_off = hdr_off + 0x80 + 1 * 0x108
-        self.assertTrue(all(patched[u1_off + 0x41 + i] == 0xE4 for i in range(76)), "Bangaa abilities mastered")
-        self.assertEqual(bytes(patched[u1_off + 0xF1 : u1_off + 0x106]), RACE_JOB_COUNTERS[2], "Bangaa job counters injected")
+        self.assertTrue(
+            all(patched[u1_off + 0x41 + i] == 0xE4 for i in range(76)),
+            "Bangaa abilities mastered",
+        )
+        self.assertEqual(
+            bytes(patched[u1_off + 0xF1 : u1_off + 0x106]),
+            RACE_JOB_COUNTERS[2],
+            "Bangaa job counters injected",
+        )
 
         # Check Unit 2 (Nu Mou)
         u2_off = hdr_off + 0x80 + 2 * 0x108
-        self.assertTrue(all(patched[u2_off + 0x41 + i] == 0xE4 for i in range(94)), "Nu Mou abilities mastered")
-        self.assertTrue(all(patched[u2_off + 0x93 + i] == 0xE4 for i in range(12)), "Nu Mou Morpher mastered")
-        self.assertEqual(bytes(patched[u2_off + 0xF1 : u2_off + 0x106]), RACE_JOB_COUNTERS[3], "Nu Mou job counters injected")
+        self.assertTrue(
+            all(patched[u2_off + 0x41 + i] == 0xE4 for i in range(94)),
+            "Nu Mou abilities mastered",
+        )
+        self.assertTrue(
+            all(patched[u2_off + 0x93 + i] == 0xE4 for i in range(12)),
+            "Nu Mou Morpher mastered",
+        )
+        self.assertEqual(
+            bytes(patched[u2_off + 0xF1 : u2_off + 0x106]),
+            RACE_JOB_COUNTERS[3],
+            "Nu Mou job counters injected",
+        )
 
         # Check Unit 3 (Viera)
         u3_off = hdr_off + 0x80 + 3 * 0x108
-        self.assertTrue(all(patched[u3_off + 0x41 + i] == 0xE4 for i in range(84)), "Viera abilities mastered")
-        self.assertEqual(bytes(patched[u3_off + 0xF1 : u3_off + 0x106]), RACE_JOB_COUNTERS[4], "Viera job counters injected")
+        self.assertTrue(
+            all(patched[u3_off + 0x41 + i] == 0xE4 for i in range(84)),
+            "Viera abilities mastered",
+        )
+        self.assertEqual(
+            bytes(patched[u3_off + 0xF1 : u3_off + 0x106]),
+            RACE_JOB_COUNTERS[4],
+            "Viera job counters injected",
+        )
 
         # Check Unit 4 (Moogle)
         u4_off = hdr_off + 0x80 + 4 * 0x108
-        self.assertTrue(all(patched[u4_off + 0x41 + i] == 0xE4 for i in range(87)), "Moogle abilities mastered")
-        self.assertEqual(bytes(patched[u4_off + 0xF1 : u4_off + 0x106]), RACE_JOB_COUNTERS[5], "Moogle job counters injected")
+        self.assertTrue(
+            all(patched[u4_off + 0x41 + i] == 0xE4 for i in range(87)),
+            "Moogle abilities mastered",
+        )
+        self.assertEqual(
+            bytes(patched[u4_off + 0xF1 : u4_off + 0x106]),
+            RACE_JOB_COUNTERS[5],
+            "Moogle job counters injected",
+        )
 
         # Verify gear was NOT clobbered
         w1, w2 = struct.unpack("<2H", patched[u0_off + 0x2A : u0_off + 0x2E])
@@ -222,7 +263,7 @@ class TestFftaTool(unittest.TestCase):
         """Verifies fix_crc corrects a corrupt CRC byte."""
         buf = bytearray(self.mock_data)
         # Corrupt Slot 1 CRC
-        buf[0x0C:0x10] = b"\xDE\xAD\xBE\xEF"
+        buf[0x0C:0x10] = b"\xde\xad\xbe\xef"
         slots_before = get_slots(buf)
         self.assertFalse(slots_before[0]["valid"], "Slot 1 should be corrupt")
 
@@ -255,6 +296,7 @@ class TestFftaTool(unittest.TestCase):
     def test_item_resolution(self):
         """Verifies KNOWN_ITEMS resolves equipment names accurately."""
         from ffta_tool import get_item_name
+
         self.assertEqual(get_item_name(0), "-")
         self.assertEqual(get_item_name(0x0026), "Tulwar")
         self.assertEqual(get_item_name(0x0029), "Apocalypse")
