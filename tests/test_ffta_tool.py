@@ -17,11 +17,15 @@ from ffta_tool import (
     RACE_JOB_COUNTERS,
     SECTOR_SIZE,
     atomic_write,
+    auto_detect_save,
     clear_clan_cards,
     compute_crc,
     create_snapshot_backup,
     fix_crc,
+    get_default_backup_dir,
     get_slots,
+    load_config,
+    parse_simple_toml,
     patch_clan_units,
     patch_super_starter,
 )
@@ -384,6 +388,72 @@ class TestFftaTool(unittest.TestCase):
         self.assertTrue(slots[1]["valid"], "Slot 2 CRC must be valid")
         self.assertEqual(slots[0]["missions"], 0, "Slot 1 missions must be 0")
         self.assertEqual(slots[1]["missions"], 0, "Slot 2 missions must be 0")
+
+    def test_parse_simple_toml(self):
+        """Verifies simple fallback TOML parser accurately parses sections and types."""
+        toml_content = """
+        # Comment line
+        [paths]
+        backup_dir = "/tmp/ffta_test_backups"
+        search_paths = [
+            "/path/one/*.sav",
+            "/path/two/*.sav"
+        ]
+
+        [defaults]
+        slot = 1
+        equip_qty = 5
+        item_qty = 50
+        backup = false
+        """
+        parsed = parse_simple_toml(toml_content)
+        self.assertEqual(parsed["paths"]["backup_dir"], "/tmp/ffta_test_backups")
+        self.assertEqual(parsed["paths"]["search_paths"], ["/path/one/*.sav", "/path/two/*.sav"])
+        self.assertEqual(parsed["defaults"]["slot"], 1)
+        self.assertEqual(parsed["defaults"]["equip_qty"], 5)
+        self.assertEqual(parsed["defaults"]["item_qty"], 50)
+        self.assertFalse(parsed["defaults"]["backup"])
+
+    def test_load_config_and_missing_file(self):
+        """Verifies load_config reads valid config files and raises FileNotFoundError on missing."""
+        with tempfile.TemporaryDirectory() as tmpdir:
+            cfg_file = os.path.join(tmpdir, "test_config.toml")
+            with open(cfg_file, "w", encoding="utf-8") as f:
+                f.write("[defaults]\nslot = 1\nequip_qty = 20\n")
+
+            loaded = load_config(cfg_file)
+            self.assertEqual(loaded.get("defaults", {}).get("slot"), 1)
+            self.assertEqual(loaded.get("defaults", {}).get("equip_qty"), 20)
+
+            # Nonexistent path should raise FileNotFoundError
+            with self.assertRaises(FileNotFoundError):
+                load_config(os.path.join(tmpdir, "nonexistent.toml"))
+
+    def test_custom_backup_dir_and_snapshot(self):
+        """Verifies get_default_backup_dir and create_snapshot_backup respect custom dir."""
+        with tempfile.TemporaryDirectory() as tmpdir:
+            custom_dir = os.path.join(tmpdir, "custom_backups")
+            resolved_dir = get_default_backup_dir(custom_dir)
+            self.assertEqual(str(resolved_dir), custom_dir)
+
+            test_save = os.path.join(tmpdir, "test.sav")
+            with open(test_save, "wb") as f:
+                f.write(self.mock_data)
+
+            b_path = create_snapshot_backup(test_save, "test_action", backup_dir=custom_dir)
+            self.assertTrue(os.path.exists(b_path))
+            self.assertTrue(b_path.startswith(custom_dir))
+
+    def test_auto_detect_save_with_config_search_paths(self):
+        """Verifies auto_detect_save finds save files matching custom search_paths in config."""
+        with tempfile.TemporaryDirectory() as tmpdir:
+            save_path = os.path.join(tmpdir, "my_custom_game.sav")
+            with open(save_path, "wb") as f:
+                f.write(self.mock_data)
+
+            cfg = {"paths": {"search_paths": [os.path.join(tmpdir, "*.sav")]}}
+            detected = auto_detect_save(cfg)
+            self.assertEqual(detected, save_path)
 
 
 if __name__ == "__main__":

@@ -73,9 +73,39 @@ ffta-tool --clear-cards --slot 2
 
 # 7. Fix corrupt save checksum (CRC32)
 ffta-tool path/to/save.sav --fix-crc --slot 2
+
+# 8. Run with custom TOML configuration file
+ffta-tool --config path/to/my_config.toml
 ```
 
 > **Safety Guard**: `--super-starter` resets mission progress to 0 and overwrites bag inventory. Saves with cleared missions are blocked automatically unless `-f` / `--force` is provided.
+
+---
+
+## Configuration (`config.toml`)
+
+You can customize default paths, search directories, and tool settings in a TOML configuration file.
+
+Copy `config.example.toml` to `config.toml` in your working directory or `~/.config/ffta-tool/config.toml`:
+
+```toml
+[paths]
+backup_dir = "~/Documents/FFTA_Backups"
+# save_file = "/path/to/custom/save.sav"
+search_paths = [
+    "/run/media/*/*/Saves/GBA/*Final Fantasy Tactics Advance*.sav",
+    "~/Documents/FFTA_Backups/*.sav",
+    "*.sav",
+]
+
+[defaults]
+slot = 2
+equip_qty = 10
+item_qty = 99
+backup = true
+```
+
+Command-line options always override configuration values.
 
 ---
 

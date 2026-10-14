@@ -1,0 +1,33 @@
+# Final Fantasy Tactics Advance (FFTA) Save Tool - Configuration Template
+# Copy this file to config.toml or ~/.config/ffta-tool/config.toml
+
+[paths]
+# Directory where automatic timestamped backups are stored.
+# Tilde (~) is automatically expanded to the user's home directory.
+backup_dir = "~/Documents/FFTA_Backups"
+
+# Optional: Default save file to target (skips auto-detection if specified).
+# Overridden if a save file path is passed directly on the command line.
+# save_file = "~/Documents/FFTA_Backups/Final_Fantasy_Tactics_Advance.sav"
+
+# List of glob patterns / paths searched during save auto-detection.
+search_paths = [
+    "/run/media/*/*/Saves/GBA/*Final Fantasy Tactics Advance*.sav",
+    "/media/*/*/Saves/GBA/*Final Fantasy Tactics Advance*.sav",
+    "/mnt/*/*/Saves/GBA/*Final Fantasy Tactics Advance*.sav",
+    "~/Documents/FFTA_Backups/*.sav",
+    "*.sav",
+]
+
+[defaults]
+# Default target save slot: 1 or 2 (default: 2)
+slot = 2
+
+# Super Starter equipment quantity per item (default: 10)
+equip_qty = 10
+
+# Super Starter consumable quantity per item (default: 99)
+item_qty = 99
+
+# Automatic snapshot backup before modifications (default: true)
+backup = true

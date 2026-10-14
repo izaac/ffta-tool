@@ -27,6 +27,14 @@ import zlib
 from datetime import datetime
 from pathlib import Path
 
+try:
+    import tomllib
+except ImportError:
+    try:
+        import tomli as tomllib
+    except ImportError:
+        tomllib = None
+
 # ==============================================================================
 # Constants & Formats
 # ==============================================================================
@@ -35,8 +43,130 @@ SECTOR_SIZE = 0x1000
 MAGIC = b"FFTEX000"
 
 
-def get_default_backup_dir() -> Path:
-    """Returns the backup directory path without using tilde expansion."""
+def parse_simple_toml(content: str) -> dict:
+    """Minimal fallback TOML parser for basic key/value tables and lists."""
+    data = {}
+    current_section = data
+    in_list_key = None
+    list_accumulator = []
+
+    for raw_line in content.splitlines():
+        line = raw_line.strip()
+        if not line or line.startswith("#"):
+            continue
+
+        if in_list_key is not None:
+            clean_part = line.split("#")[0].strip()
+            if "]" in clean_part:
+                before_bracket = clean_part.split("]")[0].strip()
+                if before_bracket:
+                    list_accumulator.append(before_bracket)
+                full_str = "".join(list_accumulator)
+                items = []
+                for item in full_str.split(","):
+                    item = item.strip()
+                    if (item.startswith('"') and item.endswith('"')) or (item.startswith("'") and item.endswith("'")):
+                        items.append(item[1:-1])
+                    elif item.isdigit():
+                        items.append(int(item))
+                    elif item:
+                        items.append(item)
+                current_section[in_list_key] = items
+                in_list_key = None
+                list_accumulator = []
+            else:
+                list_accumulator.append(clean_part)
+            continue
+
+        if line.startswith("[") and line.endswith("]"):
+            sec_name = line[1:-1].strip()
+            current_section = data.setdefault(sec_name, {})
+            continue
+
+        if "=" in line:
+            clean_line = line.split("#")[0].strip()
+            key, val = clean_line.split("=", 1)
+            key = key.strip()
+            val = val.strip()
+
+            if val.startswith("[") and not val.endswith("]"):
+                in_list_key = key
+                list_accumulator = [val[1:].strip()]
+                continue
+
+            if val.lower() == "true":
+                current_section[key] = True
+            elif val.lower() == "false":
+                current_section[key] = False
+            elif val.isdigit() or (val.startswith("-") and val[1:].isdigit()):
+                current_section[key] = int(val)
+            elif (val.startswith('"') and val.endswith('"')) or (val.startswith("'") and val.endswith("'")):
+                current_section[key] = val[1:-1]
+            elif val.startswith("[") and val.endswith("]"):
+                items = []
+                inside = val[1:-1].strip()
+                if inside:
+                    for item in inside.split(","):
+                        is_quoted = (item.startswith('"') and item.endswith('"')) or (
+                            item.startswith("'") and item.endswith("'")
+                        )
+                        if is_quoted:
+                            items.append(item[1:-1])
+                        elif item.isdigit():
+                            items.append(int(item))
+                        elif item:
+                            items.append(item)
+                current_section[key] = items
+            else:
+                current_section[key] = val
+
+    return data
+
+
+def load_config(config_path=None) -> dict:
+    """Loads configuration from a TOML file.
+
+    Search priority:
+    1. Explicit config_path (from --config)
+    2. ./config.toml (working directory)
+    3. $XDG_CONFIG_HOME/ffta-tool/config.toml or ~/.config/ffta-tool/config.toml
+    """
+    target = None
+    if config_path:
+        target = Path(os.path.expanduser(config_path))
+        if not target.is_file():
+            raise FileNotFoundError(f"Config file not found: {config_path}")
+    else:
+        local_cfg = Path("config.toml")
+        if local_cfg.is_file():
+            target = local_cfg
+        else:
+            xdg_config = os.environ.get("XDG_CONFIG_HOME")
+            if xdg_config:
+                user_cfg = Path(xdg_config) / "ffta-tool" / "config.toml"
+            else:
+                user_cfg = Path.home() / ".config" / "ffta-tool" / "config.toml"
+            if user_cfg.is_file():
+                target = user_cfg
+
+    if not target:
+        return {}
+
+    with open(target, encoding="utf-8") as f:
+        content = f.read()
+
+    if tomllib is not None:
+        try:
+            return tomllib.loads(content)
+        except Exception:
+            return parse_simple_toml(content)
+    return parse_simple_toml(content)
+
+
+def get_default_backup_dir(custom_dir=None) -> Path:
+    """Returns the backup directory path, expanding tilde if needed."""
+    if custom_dir:
+        return Path(os.path.expanduser(str(custom_dir)))
     home = os.environ.get("HOME")
     if home:
         return Path(home) / "Documents" / "FFTA_Backups"
@@ -111,32 +241,40 @@ def get_slots(sav_data):
     return slots
 
 
-def auto_detect_save():
+def auto_detect_save(config=None):
     """Attempts to find the most relevant FFTA save file automatically."""
     candidates = []
 
-    # Check removable media mounts dynamically across system mount points
-    for mount_root in ["/run/media", "/media", "/mnt"]:
-        pattern = f"{mount_root}/*/*/Saves/GBA/*Final Fantasy Tactics Advance*.sav"
-        candidates.extend(glob.glob(pattern))
+    cfg_paths = config.get("paths", {}) if config else {}
+    custom_search_paths = cfg_paths.get("search_paths")
 
-    home = os.environ.get("HOME")
-    if home:
-        home_path = Path(home)
-        doc_dir = home_path / "Documents"
-        backup_dir = doc_dir / "FFTA_Backups"
-        candidates.extend(
-            [
-                str(doc_dir / "FFTA_Save_Slot2_Mastered_Recruits_Juggler.sav"),
-                str(backup_dir / "FFTA_Save_Slot2_Mastered_Recruits_Juggler.sav"),
-                str(backup_dir / "Final_Fantasy_Tactics_Advance_Current_Patched.sav"),
-            ]
-        )
-        if backup_dir.is_dir():
-            candidates.extend(glob.glob(str(backup_dir / "*.sav")))
+    if custom_search_paths:
+        for pattern in custom_search_paths:
+            expanded = os.path.expanduser(pattern)
+            candidates.extend(glob.glob(expanded))
+    else:
+        # Check removable media mounts dynamically across system mount points
+        for mount_root in ["/run/media", "/media", "/mnt"]:
+            pattern = f"{mount_root}/*/*/Saves/GBA/*Final Fantasy Tactics Advance*.sav"
+            candidates.extend(glob.glob(pattern))
 
-    # Fallback to current directory .sav files
-    candidates.extend(glob.glob("*.sav"))
+        home = os.environ.get("HOME")
+        if home:
+            home_path = Path(home)
+            doc_dir = home_path / "Documents"
+            backup_dir = doc_dir / "FFTA_Backups"
+            candidates.extend(
+                [
+                    str(doc_dir / "FFTA_Save_Slot2_Mastered_Recruits_Juggler.sav"),
+                    str(backup_dir / "FFTA_Save_Slot2_Mastered_Recruits_Juggler.sav"),
+                    str(backup_dir / "Final_Fantasy_Tactics_Advance_Current_Patched.sav"),
+                ]
+            )
+            if backup_dir.is_dir():
+                candidates.extend(glob.glob(str(backup_dir / "*.sav")))
+
+        # Fallback to current directory .sav files
+        candidates.extend(glob.glob("*.sav"))
 
     for p in candidates:
         if os.path.isfile(p) and os.path.getsize(p) >= 0x10000:
@@ -145,15 +283,15 @@ def auto_detect_save():
     return None
 
 
-def create_snapshot_backup(filepath, action_name="update"):
+def create_snapshot_backup(filepath, action_name="update", backup_dir=None):
     """Creates a timestamped snapshot in the backups directory before writing."""
-    backup_dir = get_default_backup_dir()
-    backup_dir.mkdir(parents=True, exist_ok=True)
+    b_dir = get_default_backup_dir(backup_dir)
+    b_dir.mkdir(parents=True, exist_ok=True)
     ts = datetime.now().strftime("%Y%m%d_%H%M%S")
     base_name = os.path.splitext(os.path.basename(filepath))[0]
     clean_base = base_name.replace("Final Fantasy Tactics Advance (USA, Australia).zip", "FFTA")
     backup_filename = f"{clean_base}_{action_name}_{ts}.sav"
-    backup_path = str(backup_dir / backup_filename)
+    backup_path = str(b_dir / backup_filename)
     shutil.copy2(filepath, backup_path)
     return backup_path
 
@@ -476,6 +614,28 @@ def fix_crc(sav_data, target_slot=1):
 
 
 def main():
+    # Pre-parse --config to load defaults before initializing full parser
+    pre_parser = argparse.ArgumentParser(add_help=False)
+    pre_parser.add_argument("--config", help="Path to custom TOML configuration file")
+    pre_args, _ = pre_parser.parse_known_args()
+
+    config = {}
+    try:
+        config = load_config(pre_args.config)
+    except FileNotFoundError as e:
+        print(f"Error: {e}", file=sys.stderr)
+        sys.exit(1)
+
+    cfg_paths = config.get("paths", {})
+    cfg_defs = config.get("defaults", {})
+
+    default_slot = cfg_defs.get("slot", 2)
+    default_equip = cfg_defs.get("equip_qty", 10)
+    default_item = cfg_defs.get("item_qty", 99)
+    default_save = cfg_paths.get("save_file")
+    default_auto_backup = cfg_defs.get("backup", True)
+    custom_backup_dir = cfg_paths.get("backup_dir")
+
     parser = argparse.ArgumentParser(
         description="Final Fantasy Tactics Advance (GBA) - Save Tool & Clan Manager",
         formatter_class=argparse.RawDescriptionHelpFormatter,
@@ -488,11 +648,13 @@ Examples:
   %(prog)s --backup                       # Create an instant snapshot backup
   %(prog)s --super-starter                # Apply complete Super Starter package
   %(prog)s --fix-crc                      # Recalculate and repair CRC32 checksum
+  %(prog)s --config custom.toml           # Run with custom TOML configuration
         """,
     )
     parser.add_argument(
         "save_file",
         nargs="?",
+        default=default_save,
         help="Path to FFTA save file (.sav). Auto-detected if omitted.",
     )
     parser.add_argument(
@@ -534,32 +696,44 @@ Examples:
     parser.add_argument(
         "--slot",
         type=int,
-        default=2,
+        default=default_slot,
         choices=[1, 2],
-        help="Target save slot (1 or 2, default: 2)",
+        help=f"Target save slot (1 or 2, default: {default_slot})",
     )
     parser.add_argument(
         "--equip-qty",
         type=int,
-        default=10,
-        help="Equipment quantity for Super Starter (default: 10)",
+        default=default_equip,
+        help=f"Equipment quantity for Super Starter (default: {default_equip})",
     )
     parser.add_argument(
         "--item-qty",
         type=int,
-        default=99,
-        help="Consumable quantity for Super Starter (default: 99)",
+        default=default_item,
+        help=f"Consumable quantity for Super Starter (default: {default_item})",
     )
     parser.add_argument(
         "--no-backup",
-        action="store_true",
+        dest="auto_backup",
+        action="store_false",
         help="Disable automatic pre-patch snapshot backups",
     )
+    parser.add_argument(
+        "--auto-backup",
+        dest="auto_backup",
+        action="store_true",
+        help="Enable automatic pre-patch snapshot backups",
+    )
+    parser.set_defaults(auto_backup=default_auto_backup)
     parser.add_argument(
         "-f",
         "--force",
         action="store_true",
         help="Force patch even if save has cleared missions or story progress",
+    )
+    parser.add_argument(
+        "--config",
+        help="Path to custom TOML configuration file",
     )
     parser.add_argument("-o", "--output", help="Output path (default: overwrite input file atomically)")
 
@@ -567,8 +741,10 @@ Examples:
 
     # Save file resolution
     target_path = args.save_file
-    if not target_path:
-        target_path = auto_detect_save()
+    if target_path:
+        target_path = os.path.expanduser(target_path)
+    else:
+        target_path = auto_detect_save(config)
         if target_path:
             print(f"[*] Auto-detected save: {target_path}")
         else:
@@ -584,7 +760,7 @@ Examples:
 
     # Standalone backup
     if args.backup:
-        b_path = create_snapshot_backup(target_path, "manual_backup")
+        b_path = create_snapshot_backup(target_path, "manual_backup", backup_dir=custom_backup_dir)
         print(f"[+] Created snapshot backup: {b_path}")
         return
 
@@ -601,7 +777,7 @@ Examples:
             return
 
     # Automatic snapshot backup before modification
-    if not args.no_backup:
+    if args.auto_backup:
         action_name = (
             "super_starter"
             if args.super_starter
@@ -611,7 +787,7 @@ Examples:
             if args.clear_cards
             else "crc_fix"
         )
-        b_path = create_snapshot_backup(target_path, action_name)
+        b_path = create_snapshot_backup(target_path, action_name, backup_dir=custom_backup_dir)
         print(f"[*] Created pre-patch snapshot backup: {b_path}")
 
     # Modifications
