@@ -292,15 +292,19 @@ class TestFftaTool(unittest.TestCase):
         self.assertTrue(slots_after[0]["valid"], "Slot 1 CRC should be repaired")
 
     def test_clear_clan_cards(self):
-        """Verifies clear_clan_cards zeroes out all red and yellow cards."""
+        """Verifies clear_clan_cards zeroes out cards and pardons jailed units."""
         buf = bytearray(self.mock_data)
         s4_off = 4 * SECTOR_SIZE
 
-        # Set fake cards on Unit 0 and Unit 1 in Slot 2
+        # Set fake cards and jail flags on Unit 0 and Unit 1 in Slot 2
         u0_off = s4_off + 0x80 + 0 * 0x108
         u1_off = s4_off + 0x80 + 1 * 0x108
         buf[u0_off + 0x102] = 1  # 1 Red Card
         buf[u0_off + 0x103] = 3  # 3 Yellow Cards
+        buf[u0_off + 0x28] = 0x08  # Incarcerated in prison
+        buf[u0_off + 0x101] = 0x03  # 3 battles remaining
+        buf[u0_off + 0x104] = 0x03
+
         buf[u1_off + 0x103] = 2  # 2 Yellow Cards
 
         cleared = clear_clan_cards(buf, target_slot=1)
@@ -308,6 +312,9 @@ class TestFftaTool(unittest.TestCase):
         self.assertTrue(slots[1]["valid"], "CRC must be valid after card clearing")
         self.assertEqual(cleared[u0_off + 0x102], 0, "Red cards cleared")
         self.assertEqual(cleared[u0_off + 0x103], 0, "Yellow cards cleared")
+        self.assertEqual(cleared[u0_off + 0x28] & 0x08, 0, "Jail status cleared")
+        self.assertEqual(cleared[u0_off + 0x101], 0, "Sentence battles cleared")
+        self.assertEqual(cleared[u0_off + 0x104], 0xFF, "Unit state reset to free")
         self.assertEqual(cleared[u1_off + 0x102], 0, "Red cards cleared")
         self.assertEqual(cleared[u1_off + 0x103], 0, "Yellow cards cleared")
 

@@ -394,6 +394,9 @@ def display_roster(sav_data, slot_info):
                     card_strs.append(f"{red_cards}R")
                 eq_str += f" [Cards: {'/'.join(card_strs)}]"
 
+            if (ub[0x28] & 0x08) != 0:
+                eq_str += " [Jailed]"
+
             units.append(
                 {
                     "idx": u,
@@ -475,9 +478,13 @@ def patch_clan_units(sav_data, target_slot=1, target_unit=None):
             if race_id in RACE_JOB_COUNTERS:
                 sav_data[u_addr + 0xF1 : u_addr + 0x106] = RACE_JOB_COUNTERS[race_id]
 
-            # Clear yellow and red cards
+            # Clear yellow and red cards and jail status
             sav_data[u_addr + 0x102] = 0
             sav_data[u_addr + 0x103] = 0
+            if (sav_data[u_addr + 0x28] & 0x08) != 0:
+                sav_data[u_addr + 0x28] &= ~0x08
+                sav_data[u_addr + 0x101] = 0x00
+                sav_data[u_addr + 0x104] = 0xFF
 
             print(f"  [+] Unit {u} ({race_name}, Lv {level}): Mastered all {count} skills + unlocked advanced jobs.")
             patched_count += 1
@@ -497,7 +504,7 @@ def patch_clan_units(sav_data, target_slot=1, target_unit=None):
 
 
 def clear_clan_cards(sav_data, target_slot=1):
-    """Zeroes out all red and yellow cards for units in the target slot."""
+    """Zeroes out all red and yellow cards and pardons jailed units in target slot."""
     slots = get_slots(sav_data)
     if target_slot not in slots:
         raise ValueError(f"Slot {target_slot + 1} not found!")
@@ -514,17 +521,24 @@ def clear_clan_cards(sav_data, target_slot=1):
             break
         level = sav_data[u_addr + 0x09]
         if level > 0:
-            if sav_data[u_addr + 0x102] > 0 or sav_data[u_addr + 0x103] > 0:
+            red_cards = sav_data[u_addr + 0x102]
+            yellow_cards = sav_data[u_addr + 0x103]
+            is_jailed = (sav_data[u_addr + 0x28] & 0x08) != 0
+            if red_cards > 0 or yellow_cards > 0 or is_jailed:
                 cleared += 1
             sav_data[u_addr + 0x102] = 0  # Red Cards
             sav_data[u_addr + 0x103] = 0  # Yellow Cards
+            if is_jailed:
+                sav_data[u_addr + 0x28] &= ~0x08  # Clear In-Jail status bit
+                sav_data[u_addr + 0x101] = 0x00  # Clear remaining sentence counter
+                sav_data[u_addr + 0x104] = 0xFF  # Reset state to free (0xFF)
 
     new_counter = info["counter"] + 1
     sav_data[hdr_offset + 8 : hdr_offset + 12] = struct.pack("<I", new_counter)
     new_crc = compute_crc(sav_data, secs)
     sav_data[hdr_offset + 0x0C : hdr_offset + 0x10] = struct.pack("<I", new_crc)
 
-    print(f"  [+] Cleared all yellow and red cards for {cleared} units.")
+    print(f"  [+] Cleared all cards and pardoned jailed units for {cleared} units.")
     print(f"  [+] Sequence counter incremented to: {new_counter}")
     print(f"  [+] Checksum updated: {hex(new_crc)}")
     return sav_data
