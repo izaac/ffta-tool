@@ -158,9 +158,9 @@ gear_names = ["Ayvuir Red", "Thief Hat", "Ninja Gear", "Ninja Tabi", "Genji Arml
 name = "Hume Thief"
 race = "Hume"
 job = "Thief"
-description = "Fast disabler and looter with Cinquedea, Reverie Shield, and Thief Hat"
-gear = [0x0054, 0x0108, 0x011B, 0x0138, 0x015C]
-gear_names = ["Cinquedea", "Reverie Shield", "Thief Hat", "Ninja Gear", "Ninja Tabi"]
+description = "Lightning fast looter with dual Cinquedea speed stack (+10 Speed)"
+gear = [0x0054, 0x0054, 0x011B, 0x0138, 0x015C]
+gear_names = ["Cinquedea", "Cinquedea", "Thief Hat", "Ninja Gear", "Ninja Tabi"]
 
 [builds.ninja]
 name = "Hume Dual-Wield Ninja"
