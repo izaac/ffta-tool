@@ -331,7 +331,7 @@ Examples:
             monster_stats=args.monster_stats,
         )
 
-    if args.clear_cards and not args.patch_units and not args.super_starter and not args.inject:
+    if args.clear_cards and not args.patch_units and not args.super_starter:
         data = clear_clan_cards(data, target_slot=target_slot)
 
     if monster_bank_action and not args.super_starter:

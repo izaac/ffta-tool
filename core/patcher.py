@@ -42,13 +42,13 @@ def patch_clan_units(sav_data: bytearray, target_slot: int = 1, target_unit: int
 
     for u in units_to_patch:
         u_addr = hdr_offset + 0x80 + u * 0x108
-        if u_addr + 0x108 > len(sav_data):
+        if u_addr + 0x108 > hdr_offset + SECTOR_SIZE:
             break
 
         race_id = sav_data[u_addr + 0x06]
         level = sav_data[u_addr + 0x09]
 
-        if level > 0 and race_id in RACE_ABILITY_SPECS:
+        if 1 <= level <= 50 and race_id in RACE_ABILITY_SPECS:
             count, blue_magic, morpher = RACE_ABILITY_SPECS[race_id]
             race_name = RACE_NAMES.get(race_id, "Unknown")
 
@@ -112,10 +112,11 @@ def clear_clan_cards(sav_data: bytearray, target_slot: int = 1, re_equip: bool =
     cleared = 0
     for u in range(24):
         u_addr = hdr_offset + 0x80 + u * 0x108
-        if u_addr + 0x108 > len(sav_data):
+        if u_addr + 0x108 > hdr_offset + SECTOR_SIZE:
             break
         level = sav_data[u_addr + 0x09]
-        if level > 0:
+        race_id = sav_data[u_addr + 0x06]
+        if 1 <= level <= 50 and race_id in RACE_NAMES:
             red_cards = sav_data[u_addr + 0x102]
             yellow_cards = sav_data[u_addr + 0x103]
             is_jailed = (sav_data[u_addr + 0x28] & 0x08) != 0

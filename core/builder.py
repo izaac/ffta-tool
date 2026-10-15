@@ -80,13 +80,13 @@ def equip_unit_build(
 
     for u in units_to_process:
         u_addr = hdr_offset + 0x80 + u * 0x108
-        if u_addr + 0x108 > len(sav_data):
+        if u_addr + 0x108 > hdr_offset + SECTOR_SIZE:
             break
         level = sav_data[u_addr + 0x09]
-        if level == 0:
+        race_id = sav_data[u_addr + 0x06]
+        if level == 0 or race_id not in RACE_NAMES:
             continue
 
-        race_id = sav_data[u_addr + 0x06]
         job_id = sav_data[u_addr + 0x07]
         race_name = RACE_NAMES.get(race_id, "")
         job_name = JOB_NAMES.get(job_id, ("", ""))[0]
@@ -210,7 +210,7 @@ def inject_unit(
     if target_unit is None:
         for u in range(24):
             u_addr = hdr_offset + 0x80 + u * 0x108
-            if u_addr + 0x108 <= len(sav_data) and sav_data[u_addr + 0x09] == 0:
+            if u_addr + 0x108 <= hdr_offset + SECTOR_SIZE and sav_data[u_addr + 0x09] == 0:
                 target_unit = u
                 break
         if target_unit is None:
@@ -225,9 +225,12 @@ def inject_unit(
     existing_name_ids = set()
     for u in range(24):
         u_addr = hdr_offset + 0x80 + u * 0x108
-        if u_addr + 0x108 <= len(sav_data) and sav_data[u_addr + 0x09] > 0 and u != target_unit:
-            nid = struct.unpack("<H", sav_data[u_addr : u_addr + 2])[0]
-            existing_name_ids.add(nid)
+        if u_addr + 0x108 <= hdr_offset + SECTOR_SIZE and u != target_unit:
+            u_lvl = sav_data[u_addr + 0x09]
+            race_id_check = sav_data[u_addr + 0x06]
+            if 1 <= u_lvl <= 50 and race_id_check in RACE_NAMES:
+                nid = struct.unpack("<H", sav_data[u_addr : u_addr + 2])[0]
+                existing_name_ids.add(nid)
 
     # Resolve job, race, gear, and build title
     job_id, race_id, gear, build_title = resolve_job_and_race(build_or_job, builds_path=builds_path)
@@ -254,11 +257,12 @@ def inject_unit(
         active_levels = []
         for u in range(24):
             u_addr = hdr_offset + 0x80 + u * 0x108
-            if u_addr + 0x108 <= len(sav_data) and u != target_unit:
+            if u_addr + 0x108 <= hdr_offset + SECTOR_SIZE and u != target_unit:
                 u_lvl = sav_data[u_addr + 0x09]
-                if u_lvl > 0:
+                race_id_check = sav_data[u_addr + 0x06]
+                if 1 <= u_lvl <= 50 and race_id_check in RACE_NAMES:
                     active_levels.append(u_lvl)
-        base_level = sum(active_levels) // len(active_levels) if active_levels else 1
+        base_level = round(sum(active_levels) / len(active_levels)) if active_levels else 1
         is_advanced = job_title not in (
             "Soldier",
             "Archer",
@@ -423,8 +427,8 @@ def rename_unit(
         raise ValueError(f"Invalid unit index {target_unit}.")
 
     u_addr = hdr_offset + 0x80 + target_unit * 0x108
-    if sav_data[u_addr + 0x09] == 0:
-        raise ValueError(f"Unit {target_unit} is empty (Level 0).")
+    if u_addr + 0x108 > hdr_offset + SECTOR_SIZE or sav_data[u_addr + 0x09] == 0:
+        raise ValueError(f"Unit {target_unit} is empty or outside valid sector.")
 
     race_id = sav_data[u_addr + 0x06]
 
@@ -432,9 +436,12 @@ def rename_unit(
     existing_name_ids = set()
     for u in range(24):
         ua = hdr_offset + 0x80 + u * 0x108
-        if ua + 0x108 <= len(sav_data) and sav_data[ua + 0x09] > 0 and u != target_unit:
-            nid = struct.unpack("<H", sav_data[ua : ua + 2])[0]
-            existing_name_ids.add(nid)
+        if ua + 0x108 <= hdr_offset + SECTOR_SIZE and u != target_unit:
+            u_lvl = sav_data[ua + 0x09]
+            r_check = sav_data[ua + 0x06]
+            if 1 <= u_lvl <= 50 and r_check in RACE_NAMES:
+                nid = struct.unpack("<H", sav_data[ua : ua + 2])[0]
+                existing_name_ids.add(nid)
 
     if new_name is not None:
         clean = str(new_name).strip()

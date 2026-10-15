@@ -69,6 +69,10 @@ def auto_detect_save(config=None):
     else:
         # Check removable media mounts dynamically across system mount points
         for mount_root in ["/run/media", "/media", "/mnt", "/Volumes"]:
+            candidates.extend(glob.glob(f"{mount_root}/*/*/Saves/gba/common/*Final Fantasy Tactics Advance*.sav"))
+            candidates.extend(glob.glob(f"{mount_root}/*/*/Saves/GBA/common/*Final Fantasy Tactics Advance*.sav"))
+            candidates.extend(glob.glob(f"{mount_root}/*/Saves/gba/common/*Final Fantasy Tactics Advance*.sav"))
+            candidates.extend(glob.glob(f"{mount_root}/*/Saves/GBA/common/*Final Fantasy Tactics Advance*.sav"))
             candidates.extend(glob.glob(f"{mount_root}/*/*/Saves/GBA/*Final Fantasy Tactics Advance*.sav"))
             candidates.extend(glob.glob(f"{mount_root}/*/*/Saves/gba/*Final Fantasy Tactics Advance*.sav"))
             candidates.extend(glob.glob(f"{mount_root}/*/Saves/GBA/*Final Fantasy Tactics Advance*.sav"))
@@ -78,6 +82,8 @@ def auto_detect_save(config=None):
             import string
 
             for letter in string.ascii_uppercase[2:]:
+                candidates.extend(glob.glob(f"{letter}:\\Saves\\gba\\common\\*Final Fantasy Tactics Advance*.sav"))
+                candidates.extend(glob.glob(f"{letter}:\\Saves\\GBA\\common\\*Final Fantasy Tactics Advance*.sav"))
                 candidates.extend(glob.glob(f"{letter}:\\Saves\\gba\\*Final Fantasy Tactics Advance*.sav"))
                 candidates.extend(glob.glob(f"{letter}:\\Saves\\GBA\\*Final Fantasy Tactics Advance*.sav"))
 
@@ -104,11 +110,22 @@ def auto_detect_save(config=None):
         # Fallback to current directory .sav files
         candidates.extend(glob.glob("*.sav"))
 
-    for p in candidates:
-        if os.path.isfile(p) and os.path.getsize(p) >= 0x10000:
-            return p
+    valid_candidates = [p for p in candidates if os.path.isfile(p) and os.path.getsize(p) >= 0x10000]
+    if not valid_candidates:
+        return None
 
-    return None
+    def get_candidate_priority(filepath):
+        try:
+            with open(filepath, "rb") as f:
+                data = f.read(0x10000)
+            slots = get_slots(data)
+            max_counter = max((s["counter"] for s in slots.values() if s.get("valid")), default=0)
+            return (max_counter, os.path.getmtime(filepath))
+        except Exception:
+            return (0, os.path.getmtime(filepath))
+
+    valid_candidates.sort(key=get_candidate_priority, reverse=True)
+    return valid_candidates[0]
 
 
 def create_snapshot_backup(filepath, action_name="update", backup_dir=None):
