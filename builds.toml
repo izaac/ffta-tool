@@ -72,25 +72,25 @@ gear_names = ["Aerial Hole", "Ribbon", "Ninja Gear", "Ninja Tabi", "Genji Armlet
 name = "Viera Fencer"
 race = "Viera"
 job = "Fencer"
-description = "Rapier specialist with Flamberge, Ribbon, Ninja Tabi, and Genji Armlets"
-gear = [0x005C, 0x0114, 0x0138, 0x015C, 0x0160]
-gear_names = ["Flamberge", "Ribbon", "Ninja Gear", "Ninja Tabi", "Genji Armlets"]
+description = "Rapier specialist with Femme Fatale, Ribbon, Ninja Tabi, and Genji Armlets"
+gear = [0x0068, 0x0114, 0x0138, 0x015C, 0x0160]
+gear_names = ["Femme Fatale", "Ribbon", "Ninja Gear", "Ninja Tabi", "Genji Armlets"]
 
 [builds.elementalist]
 name = "Viera Elementalist"
 race = "Viera"
 job = "Elementalist"
-description = "Elemental magic rapier disabler with Epeprism, Magic Robe, Ribbon, and Genji Armlets"
-gear = [0x0064, 0x0114, 0x0151, 0x015C, 0x0160]
-gear_names = ["Epeprism", "Ribbon", "Magic Robe", "Ninja Tabi", "Genji Armlets"]
+description = "Elemental magic rapier specialist with Aerial Hole, Ribbon, Magic Robe, and Genji Armlets"
+gear = [0x0069, 0x0114, 0x0151, 0x015C, 0x0160]
+gear_names = ["Aerial Hole", "Ribbon", "Magic Robe", "Ninja Tabi", "Genji Armlets"]
 
 [builds.white_mage]
 name = "Viera White Mage"
 race = "Viera"
 job = "White Mage"
-description = "Staff healer with Spring Staff, White Robe, Ribbon, and Angel Ring"
-gear = [0x0080, 0x0114, 0x014A, 0x015C, 0x0165]
-gear_names = ["Spring Staff", "Ribbon", "White Robe", "Ninja Tabi", "Angel Ring"]
+description = "Staff healer with Nirvana Staff, White Robe, Ribbon, and Angel Ring"
+gear = [0x0083, 0x0114, 0x014A, 0x015C, 0x0165]
+gear_names = ["Nirvana Staff", "Ribbon", "White Robe", "Ninja Tabi", "Angel Ring"]
 
 [builds.summoner]
 name = "Viera Summoner"
@@ -155,9 +155,9 @@ gear_names = ["Chirijiraden", "Genji Shield", "Genji Helm", "Maximillian", "Ninj
 name = "Hume Fighter"
 race = "Hume"
 job = "Fighter"
-description = "Heavy blade striker with Ayvuir Red, Thief Hat, and Genji Armlets"
-gear = [0x001E, 0x011B, 0x0138, 0x015C, 0x0160]
-gear_names = ["Ayvuir Red", "Thief Hat", "Ninja Gear", "Ninja Tabi", "Genji Armlets"]
+description = "Heavy blade striker with Ebon Blade, Thief Hat, and Genji Armlets"
+gear = [0x001C, 0x011B, 0x0138, 0x015C, 0x0160]
+gear_names = ["Ebon Blade", "Thief Hat", "Ninja Gear", "Ninja Tabi", "Genji Armlets"]
 
 [builds.thief]
 name = "Hume Thief"
@@ -180,9 +180,9 @@ name = "Hume White Mage"
 race = "Hume"
 job = "White Mage"
 job_id = 7
-description = "Holy healer with Spring Staff, Acacia Hat, White Robe, and Angel Ring"
-gear = [0x0080, 0x011E, 0x014A, 0x015C, 0x0165]
-gear_names = ["Spring Staff", "Acacia Hat", "White Robe", "Ninja Tabi", "Angel Ring"]
+description = "Holy healer with Nirvana Staff, Acacia Hat, White Robe, and Angel Ring"
+gear = [0x0083, 0x011E, 0x014A, 0x015C, 0x0165]
+gear_names = ["Nirvana Staff", "Acacia Hat", "White Robe", "Ninja Tabi", "Angel Ring"]
 
 [builds.black_mage_hume]
 name = "Hume Black Mage"
@@ -296,9 +296,9 @@ name = "Bangaa Bishop"
 race = "Bangaa"
 job = "Bishop"
 job_id = 18
-description = "Holy elemental mage with Spring Staff, Acacia Hat, Black Robe, Ninja Tabi, and Angel Ring"
-gear = [0x0080, 0x011E, 0x014B, 0x015C, 0x0165]
-gear_names = ["Spring Staff", "Acacia Hat", "Black Robe", "Ninja Tabi", "Angel Ring"]
+description = "Holy elemental mage with Nirvana Staff, Acacia Hat, Black Robe, Ninja Tabi, and Angel Ring"
+gear = [0x0083, 0x011E, 0x014B, 0x015C, 0x0165]
+gear_names = ["Nirvana Staff", "Acacia Hat", "Black Robe", "Ninja Tabi", "Angel Ring"]
 
 [builds.templar]
 name = "Bangaa Templar"
