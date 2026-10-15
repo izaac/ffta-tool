@@ -629,6 +629,18 @@ class TestFftaTool(unittest.TestCase):
         # Check unit state is active (0xFF)
         self.assertEqual(patched[u5_off + 0x104], 0xFF)
 
+    def test_inject_unit_auto_level_clan_average(self):
+        """Verifies inject_unit auto-calculates level based on clan average formula when level is None."""
+        buf = bytearray(self.mock_data)
+        # Mock Slot 2 has units 0..4 all at Lv 5. Clan average is 5.
+        # Basic job (e.g. Soldier) gets clan average = 5.
+        patched, info_soldier = inject_unit(buf, build_or_job="soldier", target_slot=1, target_unit=5, level=None)
+        self.assertEqual(info_soldier["level"], 5)
+
+        # Advanced job (e.g. Paladin) gets clan average + 1 = 6.
+        patched, info_paladin = inject_unit(buf, build_or_job="paladin", target_slot=1, target_unit=6, level=None)
+        self.assertEqual(info_paladin["level"], 6)
+
     def test_inject_unit_custom_name_and_slot(self):
         """Verifies inject_unit with explicit unit slot index and custom name from ROM."""
         buf = bytearray(self.mock_data)

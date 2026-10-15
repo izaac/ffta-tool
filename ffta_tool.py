@@ -694,7 +694,7 @@ def inject_unit(
     build_or_job: str,
     target_slot: int = 1,
     target_unit: int | None = None,
-    level: int = 8,
+    level: int | None = None,
     name: str | None = None,
     builds_path: str | None = None,
 ) -> tuple[bytearray, dict]:
@@ -747,6 +747,31 @@ def inject_unit(
             unit_name = RECRUIT_NAMES[name_id]
     else:
         name_id, unit_name = generate_random_name(race_id, excluded_ids=existing_name_ids)
+
+    # Resolve unit level via canonical clan average formula if not specified
+    if level is None:
+        active_levels = []
+        for u in range(24):
+            u_addr = hdr_offset + 0x80 + u * 0x108
+            if u_addr + 0x108 <= len(sav_data) and u != target_unit:
+                u_lvl = sav_data[u_addr + 0x09]
+                if u_lvl > 0:
+                    active_levels.append(u_lvl)
+        base_level = sum(active_levels) // len(active_levels) if active_levels else 1
+        is_advanced = job_title not in (
+            "Soldier",
+            "Archer",
+            "Thief",
+            "White Mage",
+            "Black Mage",
+            "Warrior",
+            "White Monk",
+            "Animist",
+            "Fencer",
+            "Beastmaster",
+        )
+        level = base_level + (1 if is_advanced else 0)
+    level = max(1, min(50, level))
 
     # Compute 115% top-rolled god stats
     stats = compute_god_stats(job_id, level=level)
@@ -1187,8 +1212,8 @@ Examples:
     parser.add_argument(
         "--level",
         type=int,
-        default=8,
-        help="Recruit level for injected unit (default: 8)",
+        default=None,
+        help="Recruit level for injected unit (default: auto-calculated from clan average)",
     )
     parser.add_argument(
         "--name",
