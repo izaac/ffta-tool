@@ -30,10 +30,10 @@ JOB_NAMES: dict[int, tuple[str, str]] = {
     0x0C: ("Hunter", "Hume"),
     # Bangaa (0x0D..0x13)
     0x0D: ("Warrior", "Bangaa"),
-    0x0E: ("White Monk", "Bangaa"),
-    0x0F: ("Dragoon", "Bangaa"),
+    0x0E: ("Dragoon", "Bangaa"),
+    0x0F: ("Defender", "Bangaa"),
     0x10: ("Gladiator", "Bangaa"),
-    0x11: ("Defender", "Bangaa"),
+    0x11: ("White Monk", "Bangaa"),
     0x12: ("Bishop", "Bangaa"),
     0x13: ("Templar", "Bangaa"),
     # Nu Mou (0x14..0x1B)

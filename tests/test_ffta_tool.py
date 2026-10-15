@@ -575,7 +575,7 @@ class TestFftaTool(unittest.TestCase):
 
         # Bangaa Dragoon
         j_id, r_id, gear, title = resolve_job_and_race("dragoon")
-        self.assertEqual(j_id, 0x0F)
+        self.assertEqual(j_id, 0x0E)
         self.assertEqual(r_id, 2)
         self.assertEqual(gear[0], 0x00C8)
 
