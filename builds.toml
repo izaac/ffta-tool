@@ -29,6 +29,7 @@ gear_names = ["Arch Sword", "Arch Sword", "Maximillian", "Mindu Gem", "Ninja Tab
 name = "Moogle Long-Range Gunner"
 race = "Moogle"
 job = "Gunner"
+job_id = 38
 description = "Long range calling gun sniper with status immunity"
 gear = [0x00FC, 0x011B, 0x0138, 0x015C, 0x0165]
 gear_names = ["Calling Gun", "Thief Hat", "Ninja Gear", "Ninja Tabi", "Angel Ring"]
@@ -53,9 +54,10 @@ gear_names = ["Masamune 100", "Ribbon", "Ninja Gear", "Ninja Tabi", "Genji Armle
 name = "Moogle Juggler"
 race = "Moogle"
 job = "Juggler"
-description = "High speed disabler with Cinquedea and Ninja Tabi"
-gear = [0x0054, 0x0138, 0x011E, 0x015C, 0x0165]
-gear_names = ["Cinquedea", "Ninja Gear", "Acacia Hat", "Ninja Tabi", "Angel Ring"]
+job_id = 40
+description = "High speed disabler with Cinquedea, Thief Hat, Ninja Gear, Ninja Tabi, and Angel Ring"
+gear = [0x0054, 0x011B, 0x0138, 0x015C, 0x0165]
+gear_names = ["Cinquedea", "Thief Hat", "Ninja Gear", "Ninja Tabi", "Angel Ring"]
 
 [builds.red_mage]
 name = "Viera Red Mage"
@@ -213,4 +215,58 @@ job = "Hunter"
 description = "Ultima Shot specialist with Seventh Heaven, Thief Hat, and Genji Armlets"
 gear = [0x00B8, 0x011B, 0x0138, 0x015C, 0x0160]
 gear_names = ["Seventh Heaven", "Thief Hat", "Ninja Gear", "Ninja Tabi", "Genji Armlets"]
+
+[builds.animist]
+name = "Moogle Animist"
+race = "Moogle"
+job = "Animist"
+job_id = 36
+description = "Beast support musician with Fairy Harp, Thief Hat, Ninja Gear, Ninja Tabi, and Angel Ring"
+gear = [0x00D0, 0x011B, 0x0138, 0x015C, 0x0165]
+gear_names = ["Fairy Harp", "Thief Hat", "Ninja Gear", "Ninja Tabi", "Angel Ring"]
+
+[builds.mog_knight]
+name = "Moogle Mog Knight"
+race = "Moogle"
+job = "Mog Knight"
+job_id = 37
+description = "Heavy plate holy warrior with Materia Blade, Genji Shield, Genji Helm, and Maximillian"
+gear = [0x001A, 0x0103, 0x010E, 0x012B, 0x015C]
+gear_names = ["Materia Blade", "Genji Shield", "Genji Helm", "Maximillian", "Ninja Tabi"]
+
+[builds.thief_moogle]
+name = "Moogle Thief"
+race = "Moogle"
+job = "Thief"
+job_id = 39
+description = "High evasion looter with Cinquedea, Reverie Shield, Thief Hat, Ninja Gear, and Ninja Tabi"
+gear = [0x0054, 0x0108, 0x011B, 0x0138, 0x015C]
+gear_names = ["Cinquedea", "Reverie Shield", "Thief Hat", "Ninja Gear", "Ninja Tabi"]
+
+[builds.gadgeteer]
+name = "Moogle Gadgeteer"
+race = "Moogle"
+job = "Gadgeteer"
+job_id = 41
+description = "Status gadget box expert with Godhand, Thief Hat, Ninja Gear, Ninja Tabi, and Angel Ring"
+gear = [0x00DF, 0x011B, 0x0138, 0x015C, 0x0165]
+gear_names = ["Godhand", "Thief Hat", "Ninja Gear", "Ninja Tabi", "Angel Ring"]
+
+[builds.black_mage_moogle]
+name = "Moogle Black Mage"
+race = "Moogle"
+job = "Black Mage"
+job_id = 42
+description = "Elemental magic caster with Princess Rod, Acacia Hat, Black Robe, and Angel Ring"
+gear = [0x0091, 0x011E, 0x014B, 0x015C, 0x0165]
+gear_names = ["Princess Rod", "Acacia Hat", "Black Robe", "Ninja Tabi", "Angel Ring"]
+
+[builds.time_mage_moogle]
+name = "Moogle Time Mage"
+race = "Moogle"
+job = "Time Mage"
+job_id = 43
+description = "Temporal manipulator with Princess Rod, Acacia Hat, Black Robe, and Angel Ring"
+gear = [0x0091, 0x011E, 0x014B, 0x015C, 0x0165]
+gear_names = ["Princess Rod", "Acacia Hat", "Black Robe", "Ninja Tabi", "Angel Ring"]
 

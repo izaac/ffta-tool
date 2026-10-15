@@ -384,7 +384,8 @@ class TestFftaTool(unittest.TestCase):
         self.assertEqual(len(mappings.RACE_NAMES), 5)
         self.assertIn(1, mappings.RACE_NAMES)
         self.assertEqual(mappings.RACE_NAMES[1], "Hume")
-        self.assertEqual(mappings.JOB_NAMES[0x01], ("Soldier", "Hume"))
+        self.assertEqual(mappings.JOB_NAMES[0x01], ("Soldier (Prologue)", "Hume"))
+        self.assertEqual(mappings.JOB_NAMES[0x02], ("Soldier", "Hume"))
         self.assertEqual(mappings.JOB_NAMES[0x21], ("Archer", "Viera"))
         self.assertEqual(len(mappings.EQUIPMENT_IDS), 361)
         self.assertEqual(len(mappings.CONSUMABLE_IDS), 14)
@@ -687,6 +688,26 @@ class TestFftaTool(unittest.TestCase):
 
         slots = get_slots(patched)
         self.assertTrue(slots[1]["valid"], "CRC must be valid after renaming")
+
+    def test_moogle_builds_resolution(self):
+        """Verifies all 8 Moogle jobs resolve from builds.toml with full equipment sets."""
+        moogle_jobs = [
+            ("animist", 0x24),
+            ("mog_knight", 0x25),
+            ("gunner", 0x26),
+            ("moogle_thief", 0x27),
+            ("juggler", 0x28),
+            ("gadgeteer", 0x29),
+            ("moogle_black_mage", 0x2A),
+            ("moogle_time_mage", 0x2B),
+        ]
+        for query, expected_job_id in moogle_jobs:
+            job_id, race_id, gear, title = resolve_job_and_race(query)
+            self.assertEqual(race_id, 5, f"Race must be Moogle (5) for {query}")
+            self.assertEqual(job_id, expected_job_id, f"Job ID mismatch for {query}")
+            self.assertEqual(len(gear), 5, f"Gear must have 5 items for {query}")
+            self.assertTrue(all(item > 0 for item in gear), f"Gear items must all be non-zero for {query}")
+            self.assertIn("Moogle", title)
 
     @unittest.skipUnless(
         os.path.exists(
