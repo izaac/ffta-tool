@@ -656,14 +656,16 @@ def resolve_job_and_race(query: str, builds_path: str | None = None) -> tuple[in
         race_id = next((r_id for r_id, r_name in RACE_NAMES.items() if r_name.lower() == b_race.lower()), None)
         if race_id is None:
             raise ValueError(f"Unknown race in build: {b_race}")
-        job_id = next(
-            (
-                j_id
-                for j_id, (j_name, j_race) in JOB_NAMES.items()
-                if j_name.lower() == b_job.lower() and j_race.lower() == b_race.lower()
-            ),
-            None,
-        )
+        job_id = selected_build.get("job_id")
+        if job_id is None:
+            job_id = next(
+                (
+                    j_id
+                    for j_id, (j_name, j_race) in JOB_NAMES.items()
+                    if j_name.lower() == b_job.lower() and j_race.lower() == b_race.lower()
+                ),
+                None,
+            )
         if job_id is None:
             raise ValueError(f"Unknown job in build: {b_job} ({b_race})")
         gear = selected_build.get("gear", [0, 0, 0, 0, 0])
