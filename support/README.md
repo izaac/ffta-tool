@@ -4,7 +4,7 @@ High-value automation and inspection scripts for *Final Fantasy Tactics Advance*
 
 ---
 
-## 🛠️ Tools Overview
+## Tools Overview
 
 | Script | Purpose | Key Flags |
 | --- | --- | --- |
@@ -15,9 +15,11 @@ High-value automation and inspection scripts for *Final Fantasy Tactics Advance*
 | [`inspect_rom.py`](inspect_rom.py) | Inspects ROM base stats/growths (`0x521A80`), item IDs, recruit names, and race ability mappings. | `--job`, `--item`, `--name`, `--races` |
 | [`fix_save_crc.py`](fix_save_crc.py) | Recalculates and repairs Sector 0 / Sector 1 CRC32 checksums for both save slots without altering unit data. | `<path>` |
 
+> Note: Support scripts automatically discover local save files in `~/Documents/FFTA_Assets` and mounted Analogue Pocket SD cards.
+
 ---
 
-## 🚀 Quick Usage Examples
+## Quick Usage Examples
 
 ### 1. Save Health Check & Diagnostics
 
