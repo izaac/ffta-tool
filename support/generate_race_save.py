@@ -110,29 +110,33 @@ def setup_marche(sav_data: bytearray, sec0_offset: int):
     ub[0x00:0x02] = struct.pack("<H", 33)
     ub[0x04] = 2
     ub[0x05] = 80  # Sprite index
-    ub[0x06] = 1   # Race Hume
+    ub[0x06] = 1  # Race Hume
     ub[0x07] = 10  # Primary Blue Mage (0x0A)
-    ub[0x08] = 4   # Secondary Fighter (0x04)
-    ub[0x09] = 9   # Level 9
+    ub[0x08] = 4  # Secondary Fighter (0x04)
+    ub[0x09] = 9  # Level 9
 
     # God stats
     god = compute_god_stats(10, level=9)
     ub[0x18:0x28] = struct.pack(
         "<8H",
-        god["hp"], god["hp"],
-        god["mp"], god["mp"],
-        god["watk"], god["wdef"],
-        god["mpow"], god["mres"],
+        god["hp"],
+        god["hp"],
+        god["mp"],
+        god["mp"],
+        god["watk"],
+        god["wdef"],
+        god["mpow"],
+        god["mres"],
     )
 
     # Equipment: Tulwar (0x26), Tulwar (0x26), Acacia Hat (0x11E), Ninja Gear (0x138), Fairy Shoes (0x15A)
     ub[0x2A:0x34] = struct.pack("<5H", 0x0026, 0x0026, 0x011E, 0x0138, 0x015A)
 
     ub[0x34] = 142  # Race ability base
-    ub[0x35] = 11   # Primary A-Set: Blue Magic
-    ub[0x36] = 4    # Secondary A-Set: Fighter Tech
-    ub[0x3A] = 31   # Reflex
-    ub[0x3B] = 56   # Double Sword
+    ub[0x35] = 11  # Primary A-Set: Blue Magic
+    ub[0x36] = 4  # Secondary A-Set: Fighter Tech
+    ub[0x3A] = 31  # Reflex
+    ub[0x3B] = 56  # Double Sword
     ub[0x3C] = 117  # Blue Combo
 
     # Master all Hume abilities (140) + Blue Magic (26)
@@ -162,29 +166,33 @@ def setup_montblanc(sav_data: bytearray, sec0_offset: int):
     ub[0x00:0x02] = struct.pack("<H", 102)
     ub[0x04] = 8
     ub[0x05] = 82  # Sprite index
-    ub[0x06] = 5   # Moogle
+    ub[0x06] = 5  # Moogle
     ub[0x07] = 38  # Gunner (0x26)
     ub[0x08] = 37  # Mog Knight (0x25)
-    ub[0x09] = 8   # Level 8
+    ub[0x09] = 8  # Level 8
 
     god = compute_god_stats(38, level=8)
     ub[0x18:0x28] = struct.pack(
         "<8H",
-        god["hp"], god["hp"],
-        god["mp"], god["mp"],
-        god["watk"], god["wdef"],
-        god["mpow"], god["mres"],
+        god["hp"],
+        god["hp"],
+        god["mp"],
+        god["mp"],
+        god["watk"],
+        god["wdef"],
+        god["mpow"],
+        god["mres"],
     )
 
     # Equipment: Calling Gun (0xFC), Thief Hat (0x11B), Ninja Gear (0x138), Ninja Tabi (0x15C), Angel Ring (0x165)
     ub[0x2A:0x34] = struct.pack("<5H", 0x00FC, 0x011B, 0x0138, 0x015C, 0x0165)
 
-    ub[0x34] = 88   # Moogle ability base
-    ub[0x35] = 28   # Primary A-Set: Gunmanship
-    ub[0x36] = 32   # Secondary A-Set: Charge
-    ub[0x3A] = 64   # Damage > MP
-    ub[0x3B] = 30   # Concentrate
-    ub[0x3C] = 31   # Gun Combo
+    ub[0x34] = 88  # Moogle ability base
+    ub[0x35] = 28  # Primary A-Set: Gunmanship
+    ub[0x36] = 32  # Secondary A-Set: Charge
+    ub[0x3A] = 64  # Damage > MP
+    ub[0x3B] = 30  # Concentrate
+    ub[0x3C] = 31  # Gun Combo
 
     # Master all Moogle abilities
     count, _, _ = RACE_ABILITY_SPECS[5]

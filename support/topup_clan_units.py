@@ -71,9 +71,7 @@ def topup_unit(
     job_name = JOB_NAMES.get(job_id, ("Unknown", ""))[0]
 
     # Current stats
-    cur_hp, cur_max_hp, cur_mp, cur_max_mp, cur_watk, cur_wdef, cur_mpow, cur_mres = struct.unpack(
-        "<8H", ub[0x18:0x28]
-    )
+    cur_hp, cur_max_hp, cur_mp, cur_max_mp, cur_watk, cur_wdef, cur_mpow, cur_mres = struct.unpack("<8H", ub[0x18:0x28])
     cur_spd = struct.unpack("<H", ub[0xD2:0xD4])[0]
 
     # Compute 115% top-rolled god stats
@@ -90,10 +88,14 @@ def topup_unit(
 
     ub[0x18:0x28] = struct.pack(
         "<8H",
-        new_hp, new_hp,
-        new_mp, new_mp,
-        new_watk, new_wdef,
-        new_mpow, new_mres,
+        new_hp,
+        new_hp,
+        new_mp,
+        new_mp,
+        new_watk,
+        new_wdef,
+        new_mpow,
+        new_mres,
     )
     ub[0xD2:0xD4] = struct.pack("<H", new_spd)
 

@@ -206,8 +206,7 @@ def patch_super_starter(
         sav_data[addr + 3] = 0
 
     print(
-        f"  [+] Injected {len(EQUIPMENT_IDS)} weapons/gear ({e_qty}x) "
-        f"and {len(CONSUMABLE_IDS)} consumables ({i_qty}x)."
+        f"  [+] Injected {len(EQUIPMENT_IDS)} weapons/gear ({e_qty}x) and {len(CONSUMABLE_IDS)} consumables ({i_qty}x)."
     )
 
     # 5. Populate Monster Bank with all 20 monsters
@@ -350,4 +349,3 @@ def inject_monster_bank(
         print(f"  [+] Checksum updated: {hex(new_crc)}")
 
     return sav_data
-

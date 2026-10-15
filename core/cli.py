@@ -245,16 +245,15 @@ Examples:
         data = bytearray(f.read())
 
     if len(data) < 0x10000:
-        print(f"Error: Invalid save file size ({len(data)} bytes). Expected at least 65536 bytes for GBA Flash.", file=sys.stderr)
+        print(
+            f"Error: Invalid save file size ({len(data)} bytes). Expected at least 65536 bytes for GBA Flash.",
+            file=sys.stderr,
+        )
         sys.exit(1)
 
     target_slot = args.slot - 1
 
-    monster_bank_action = (
-        args.inject_monsters
-        or args.monster_level is not None
-        or args.monster_stats is not None
-    )
+    monster_bank_action = args.inject_monsters or args.monster_level is not None or args.monster_stats is not None
 
     # Default action: Inspect
     is_modifying = (

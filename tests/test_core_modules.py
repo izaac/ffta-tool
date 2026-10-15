@@ -1,7 +1,9 @@
 """Tests for the modularized core package."""
 
 import os
+import shutil
 import sys
+import tempfile
 import unittest
 
 sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), "..")))
@@ -137,9 +139,6 @@ class TestCoreModules(unittest.TestCase):
 
     def test_atomic_write_and_builds_fallback(self):
         """Ensure atomic_write safely creates parent directories and load_builds resolves repo builds."""
-        import tempfile
-        import shutil
-
         # Test atomic_write directory creation
         td = tempfile.mkdtemp()
         try:

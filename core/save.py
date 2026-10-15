@@ -76,6 +76,7 @@ def auto_detect_save(config=None):
 
         if os.name == "nt":
             import string
+
             for letter in string.ascii_uppercase[2:]:
                 candidates.extend(glob.glob(f"{letter}:\\Saves\\gba\\*Final Fantasy Tactics Advance*.sav"))
                 candidates.extend(glob.glob(f"{letter}:\\Saves\\GBA\\*Final Fantasy Tactics Advance*.sav"))

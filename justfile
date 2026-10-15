@@ -17,14 +17,22 @@ test:
 
 # Lint and check codebase
 check: test
-    @if command -v npx >/dev/null 2>&1; then \
-        npx markdownlint-cli "docs/*.md" "README.md" "support/README.md" ; \
+    @if command -v uvx >/dev/null 2>&1; then \
+        uvx ruff check . ; \
+    elif command -v ruff >/dev/null 2>&1; then \
+        ruff check . ; \
+    else \
+        python3 -m ruff check . ; \
     fi
 
-# Format markdown documentation
+# Format codebase
 fmt:
-    @if command -v npx >/dev/null 2>&1; then \
-        npx markdownlint-cli --fix "docs/*.md" "README.md" "support/README.md" ; \
+    @if command -v uvx >/dev/null 2>&1; then \
+        uvx ruff format . && uvx ruff check --fix . ; \
+    elif command -v ruff >/dev/null 2>&1; then \
+        ruff format . && ruff check --fix . ; \
+    else \
+        python3 -m ruff format . && python3 -m ruff check --fix . ; \
     fi
 
 # Sync ROMs and saves to Analogue Pocket SD card

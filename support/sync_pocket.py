@@ -6,11 +6,11 @@ and the Analogue Pocket SD card filesystem, then triggers an OS sync.
 """
 
 import argparse
+import contextlib
 import hashlib
 import os
 import shutil
 import sys
-
 from pathlib import Path
 
 DEFAULT_ASSET_DIR = os.environ.get(
@@ -27,11 +27,13 @@ def find_pocket_base() -> str:
     # Windows drive detection (e.g. D:\, E:\, F:\)
     if os.name == "nt":
         import string
+
         for letter in string.ascii_uppercase[2:]:
             drive = f"{letter}:\\"
-            if os.path.exists(drive):
-                if os.path.exists(os.path.join(drive, "Saves")) or os.path.exists(os.path.join(drive, "Assets")):
-                    return drive
+            if os.path.exists(drive) and (
+                os.path.exists(os.path.join(drive, "Saves")) or os.path.exists(os.path.join(drive, "Assets"))
+            ):
+                return drive
 
     for mount_root in ["/run/media", "/media", "/mnt", "/Volumes"]:
         if os.path.exists(mount_root):
@@ -136,10 +138,8 @@ def sync_pocket(asset_dir: str = DEFAULT_ASSET_DIR, pocket_base: str = DEFAULT_P
     if not dry_run and copied_count > 0:
         print("\n[*] Flushing OS filesystem buffers (sync)...")
         if hasattr(os, "sync"):
-            try:
+            with contextlib.suppress(OSError):
                 os.sync()
-            except OSError:
-                pass
         print("[+] Filesystem buffers flushed successfully.")
 
     print(f"\n{'=' * 78}")

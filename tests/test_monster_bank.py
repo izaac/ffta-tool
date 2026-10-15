@@ -11,7 +11,6 @@ from core.patcher import (
     pack_monster_stats,
     unpack_monster_stats,
 )
-from core.roster import inspect_save
 from core.save import SECTOR_SIZE, compute_crc, get_slots
 from support.validate_saves import validate_save_file
 
