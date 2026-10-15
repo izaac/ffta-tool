@@ -676,6 +676,34 @@ class TestFftaTool(unittest.TestCase):
         slots = get_slots(patched)
         self.assertTrue(slots[1]["valid"], "CRC must be valid after renaming")
 
+    @unittest.skipUnless(
+        os.path.exists(
+            os.environ.get(
+                "FFTA_ROM_PATH",
+                "/home/izaac/Documents/FFTA_Assets/Final Fantasy Tactics Advance (U) [!].gba",
+            )
+        ),
+        "Local ROM file not present; skipping live ROM binary verification",
+    )
+    def test_optional_rom_verification(self):
+        """Optionally validates embedded tables match local GBA ROM when present."""
+        rom_path = os.environ.get(
+            "FFTA_ROM_PATH",
+            "/home/izaac/Documents/FFTA_Assets/Final Fantasy Tactics Advance (U) [!].gba",
+        )
+        with open(rom_path, "rb") as f:
+            rom = f.read()
+
+        # Verify pointer table has 725 names
+        self.assertEqual(len(RECRUIT_NAMES), 725)
+
+        # Verify first name (Arthur) and last name (Romark) match pointers
+        tbl_start = 0x5680DC
+        p0 = struct.unpack("<I", rom[tbl_start : tbl_start + 4])[0] - 0x08000000
+        p_last = struct.unpack("<I", rom[tbl_start + 724 * 4 : tbl_start + 725 * 4])[0] - 0x08000000
+        self.assertEqual(rom[p0 : p0 + 2], bytes([1, 177]))  # "Arthur"
+        self.assertEqual(rom[p_last : p_last + 2], bytes([1, 194]))  # "Romark"
+
 
 if __name__ == "__main__":
     unittest.main()
