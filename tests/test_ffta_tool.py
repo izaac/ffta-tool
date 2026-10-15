@@ -489,8 +489,8 @@ class TestFftaTool(unittest.TestCase):
         slots = get_slots(patched)
         self.assertTrue(slots[1]["valid"], "CRC must be valid after equipping build")
 
-        # White Monk gear: [0x00C8, 0x0000, 0x0111, 0x012B, 0x015C]
-        expected_gear = struct.pack("<5H", 0x00C8, 0x0000, 0x0111, 0x012B, 0x015C)
+        # White Monk gear: [0x00C8, 0x012B, 0x0111, 0x015C, 0x0169]
+        expected_gear = struct.pack("<5H", 0x00C8, 0x012B, 0x0111, 0x015C, 0x0169)
         self.assertEqual(patched[u1_off + 0x2A : u1_off + 0x34], expected_gear)
 
     def test_clear_clan_cards_auto_re_equip(self):
@@ -512,7 +512,7 @@ class TestFftaTool(unittest.TestCase):
         self.assertEqual(cleared[u1_off + 0x104], 0xFF, "Unit state reset to free")
 
         # Gear should have been auto re-equipped from builds.toml
-        expected_gear = struct.pack("<5H", 0x00C8, 0x0000, 0x0111, 0x012B, 0x015C)
+        expected_gear = struct.pack("<5H", 0x00C8, 0x012B, 0x0111, 0x015C, 0x0169)
         self.assertEqual(cleared[u1_off + 0x2A : u1_off + 0x34], expected_gear)
 
 

@@ -5,9 +5,9 @@
 name = "Bangaa Gladiator"
 race = "Bangaa"
 job = "Gladiator"
-description = "High physical damage with Ebon Blade, Ninja Gear, and Ninja Tabi"
-gear = [0x001C, 0x0000, 0x011B, 0x0138, 0x015C]
-gear_names = ["Ebon Blade", "-", "Thief Hat", "Ninja Gear", "Ninja Tabi"]
+description = "High physical damage with Ebon Blade, Ninja Gear, Ninja Tabi, and Mindu Gem"
+gear = [0x001C, 0x0138, 0x011B, 0x015C, 0x0169]
+gear_names = ["Ebon Blade", "Ninja Gear", "Thief Hat", "Ninja Tabi", "Mindu Gem"]
 
 [builds.blue_mage]
 name = "Hume Dual-Wield Blue Mage"
@@ -30,45 +30,45 @@ name = "Moogle Long-Range Gunner"
 race = "Moogle"
 job = "Gunner"
 description = "Long range calling gun sniper with status immunity"
-gear = [0x00FC, 0x0000, 0x011B, 0x0138, 0x015C]
-gear_names = ["Calling Gun", "-", "Thief Hat", "Ninja Gear", "Ninja Tabi"]
+gear = [0x00FC, 0x011B, 0x0138, 0x015C, 0x0165]
+gear_names = ["Calling Gun", "Thief Hat", "Ninja Gear", "Ninja Tabi", "Angel Ring"]
 
 [builds.sage]
 name = "Nu Mou Sage"
 race = "Nu Mou"
 job = "Sage"
 description = "Spellcaster with Sage Crosier, Magic Robe, and Ninja Tabi"
-gear = [0x0098, 0x0000, 0x011E, 0x0151, 0x015C]
-gear_names = ["Sage Crosier", "-", "Acacia Hat", "Magic Robe", "Ninja Tabi"]
+gear = [0x0098, 0x0151, 0x011E, 0x015C, 0x0165]
+gear_names = ["Sage Crosier", "Magic Robe", "Acacia Hat", "Ninja Tabi", "Angel Ring"]
 
 [builds.assassin]
 name = "Viera Speed Assassin"
 race = "Viera"
 job = "Assassin"
 description = "High speed Masamune 100 with Ribbon and Angel Ring"
-gear = [0x0076, 0x0000, 0x0114, 0x0138, 0x015C]
-gear_names = ["Masamune 100", "-", "Ribbon", "Ninja Gear", "Ninja Tabi"]
+gear = [0x0076, 0x0138, 0x0114, 0x015C, 0x0165]
+gear_names = ["Masamune 100", "Ninja Gear", "Ribbon", "Ninja Tabi", "Angel Ring"]
 
 [builds.juggler]
 name = "Moogle Juggler"
 race = "Moogle"
 job = "Juggler"
 description = "High speed disabler with Cinquedea and Ninja Tabi"
-gear = [0x0054, 0x0000, 0x011E, 0x0138, 0x015C]
-gear_names = ["Cinquedea", "-", "Acacia Hat", "Ninja Gear", "Ninja Tabi"]
+gear = [0x0054, 0x0138, 0x011E, 0x015C, 0x0165]
+gear_names = ["Cinquedea", "Ninja Gear", "Acacia Hat", "Ninja Tabi", "Angel Ring"]
 
 [builds.red_mage]
 name = "Viera Red Mage"
 race = "Viera"
 job = "Red Mage"
 description = "Doublecast rapier specialist with Ribbon and Genji Armlets"
-gear = [0x0069, 0x0000, 0x0114, 0x0138, 0x015C]
-gear_names = ["Aerial Hole", "-", "Ribbon", "Ninja Gear", "Ninja Tabi"]
+gear = [0x0069, 0x0114, 0x0138, 0x015C, 0x0160]
+gear_names = ["Aerial Hole", "Ribbon", "Ninja Gear", "Ninja Tabi", "Genji Armlets"]
 
 [builds.white_monk]
 name = "Bangaa White Monk"
 race = "Bangaa"
 job = "White Monk"
 description = "Martial artist with Bangaa Spike, Maximillian, and Mindu Gem"
-gear = [0x00C8, 0x0000, 0x0111, 0x012B, 0x015C]
-gear_names = ["Bangaa Spike", "-", "Bangaa Helm", "Maximillian", "Ninja Tabi"]
+gear = [0x00C8, 0x012B, 0x0111, 0x015C, 0x0169]
+gear_names = ["Bangaa Spike", "Maximillian", "Bangaa Helm", "Ninja Tabi", "Mindu Gem"]
