@@ -20,7 +20,7 @@ In our system:
 | **Materia Blade** (17 Atk) | **Ebon Blade** (84 Atk, Dark) | +67 WAtk |
 | **Ayvuir Red** (62 Atk) | **Ebon Blade** (84 Atk, Dark) | +22 WAtk |
 | **Flamberge** (35 Atk) | **Femme Fatale** (49 Atk, +2 Spd) | +14 WAtk, +2 Speed, Null Doom |
-| **Spring Staff** (28 Atk) | **Nirvana Staff** (34 Atk, +10 MRes) | +6 WAtk, +10 MRes, Holy |
+| **Spring Staff** (28 Atk) | **Dream Watcher** (43 Atk, +10 MPow, +15 MRes) | +15 WAtk, +10 MPow, +15 MRes |
 | **Silver Sword** (20 Atk) | **Chirijiraden** (65 Atk) | +45 WAtk |
 | **Shortbow** (19 Atk) | **Perseus Bow** (42 Atk) | +23 WAtk |
 
@@ -45,7 +45,7 @@ A critical distinction between *Final Fantasy Tactics Advance* (GBA) and its Nin
 ### Hume Fleet (Versatility & Dual Wield)
 
 - **Blue Mage**: Dual Tulwars (+4 Speed total, 43 Atk each), Acacia Hat (+2 Speed, +20 Res), Ninja Gear (+2 Speed), Fairy Shoes (teleport mobility). Master of crowd control (Night, Roulette, Bad Breath).
-- **Paladin**: Dual Arch Swords (82 Atk each) delivering Holy Blade strikes, Maximillian (+62 Def plate), Mindu Gem (complete status immunity), and Ninja Tabi (+2 Move).
+- **Paladin**: Dual Excaliburs (47 Atk each, Holy element, +2 MPow, +1 Speed, +5 Evade) delivering Holy Blade strikes, Maximillian (+62 Def plate), Mindu Gem (complete status immunity), and Ninja Tabi (+2 Move).
 - **Fighter**: Ebon Blade (84 Atk) with Air Render and Back Draft.
 - **Thief**: Cinquedea (57 Atk, +5 Speed) paired with Concentrate (guarantees 95% Steal rate on Weapon, Armor, and Ability), Reflex (100% physical evasion), Thief Hat, Ninja Gear, Ninja Tabi, and Genji Armlets. Dual Cinquedea Double Sword variant also available for raw speed stack (+10 Speed).
 - **Default Secondary**: Fighter Tech (Set 4). If primary is Fighter, falls back to Paladin Holy Blade (Set 3).
@@ -55,7 +55,7 @@ A critical distinction between *Final Fantasy Tactics Advance* (GBA) and its Nin
 - **White Monk Gear Constraint**: White Monks **cannot equip headgear or shields** in FFTA engine rules. Equipped with Godhand (52 Atk), Ninja Gear, Ninja Tabi, Mindu Gem, and Genji Armlets.
 - **Gladiator**: Ebon Blade (84 Atk) Ultima Sword striker.
 - **Dragoon**: Bangaa Spike (53 Atk, +5 Def, +5 Res, 2-handed spear) for 2-tile piercing reach and Jump.
-- **Defender / Templar**: Arch Sword (82 Atk) paired with Genji Shield (+10 Evade) and Maximillian plate.
+- **Defender / Templar**: Excalibur (47 Atk, Holy element, +1 Speed, +5 Evade) paired with Genji Shield (+10 Evade) and Maximillian plate.
 - **Default Secondary**: White Monk Tech (Set 22: Air Render, Far Fist, Earth Render).
 
 ### Nu Mou Fleet (Devastating Magic Artistry)
@@ -69,6 +69,7 @@ A critical distinction between *Final Fantasy Tactics Advance* (GBA) and its Nin
 
 - **Assassin**: Masamune 100 (65 Atk, +2 Speed), Ribbon (full female status immunity), Ninja Gear, Ninja Tabi, Genji Armlets. 200+ Speed capable of opening turns with Last Breath (KO) or Rockseal.
 - **Red Mage**: Aerial Hole (43 Atk, +8 MPow, +2 Speed) paired with Doublecast and Summoning secondary.
+- **Summoner**: Dream Watcher (43 Atk, +10 MPow, +15 MRes) providing the highest Magic Power staff boost for summons (Madeen, Ramuh, Shiva, Ifrit) paired with Magic Robe (+10 MPow), Ribbon, and Angel Ring.
 - **Sniper**: Max's Oathbow (63 Atk) with Beso Toxico and Aim Armor.
 - **Default Secondary**: Sharpshoot (Set 26). If primary is Sniper, falls back to Assassination (Set 25).
 

@@ -22,9 +22,9 @@ gear_names = ["Tulwar", "Tulwar", "Acacia Hat", "Ninja Gear", "Fairy Shoes"]
 name = "Hume Dual-Wield Paladin"
 race = "Hume"
 job = "Paladin"
-description = "Dual Arch Sword holy warrior with Maximillian plate defense and Mindu Gem"
-gear = [0x002E, 0x002E, 0x012B, 0x0169, 0x015C]
-gear_names = ["Arch Sword", "Arch Sword", "Maximillian", "Mindu Gem", "Ninja Tabi"]
+description = "Dual Excalibur holy blade master with Maximillian plate defense and Mindu Gem"
+gear = [0x002F, 0x002F, 0x012B, 0x0169, 0x015C]
+gear_names = ["Excalibur", "Excalibur", "Maximillian", "Mindu Gem", "Ninja Tabi"]
 
 [builds.gunner]
 name = "Moogle Long-Range Gunner"
@@ -96,9 +96,9 @@ gear_names = ["Nirvana Staff", "Ribbon", "White Robe", "Ninja Tabi", "Angel Ring
 name = "Viera Summoner"
 race = "Viera"
 job = "Summoner"
-description = "High magic summoner with Nirvana Staff, Magic Robe, Ribbon, and Angel Ring"
-gear = [0x0083, 0x0114, 0x0151, 0x015C, 0x0165]
-gear_names = ["Nirvana Staff", "Ribbon", "Magic Robe", "Ninja Tabi", "Angel Ring"]
+description = "High magic summoner with Dream Watcher (+10 MagPow, +15 MagRes), Magic Robe, Ribbon, and Angel Ring"
+gear = [0x0086, 0x0114, 0x0151, 0x015C, 0x0165]
+gear_names = ["Dream Watcher", "Ribbon", "Magic Robe", "Ninja Tabi", "Angel Ring"]
 
 [builds.archer]
 name = "Viera Archer"
@@ -303,9 +303,9 @@ name = "Bangaa Defender"
 race = "Bangaa"
 job = "Defender"
 job_id = 15
-description = "Impenetrable knightsword fortress with Arch Sword, Genji Shield, Genji Helm, and Maximillian"
-gear = [0x002E, 0x0103, 0x010E, 0x012B, 0x015C]
-gear_names = ["Arch Sword", "Genji Shield", "Genji Helm", "Maximillian", "Ninja Tabi"]
+description = "Impenetrable holy knightsword fortress with Excalibur, Genji Shield, Genji Helm, and Maximillian"
+gear = [0x002F, 0x0103, 0x010E, 0x012B, 0x015C]
+gear_names = ["Excalibur", "Genji Shield", "Genji Helm", "Maximillian", "Ninja Tabi"]
 
 [builds.bishop]
 name = "Bangaa Bishop"
@@ -321,9 +321,9 @@ name = "Bangaa Templar"
 race = "Bangaa"
 job = "Templar"
 job_id = 19
-description = "Holy knight with Arch Sword, Genji Shield, Genji Helm, Maximillian, and Ninja Tabi"
-gear = [0x002E, 0x0103, 0x010E, 0x012B, 0x015C]
-gear_names = ["Arch Sword", "Genji Shield", "Genji Helm", "Maximillian", "Ninja Tabi"]
+description = "Holy knight with Excalibur, Genji Shield, Genji Helm, Maximillian, and Ninja Tabi"
+gear = [0x002F, 0x0103, 0x010E, 0x012B, 0x015C]
+gear_names = ["Excalibur", "Genji Shield", "Genji Helm", "Maximillian", "Ninja Tabi"]
 
 [builds.white_mage_numou]
 name = "Nu Mou White Mage"
