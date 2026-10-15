@@ -1,22 +1,29 @@
 # Final Fantasy Tactics Advance (GBA) Save Tool
 
-A simple, standalone tool to inspect, backup, and patch *Final Fantasy Tactics Advance* save files for handheld consoles (NextUI, Miyoo, Anbernic) and PC emulators.
+Standalone utility to inspect, backup, and patch *Final Fantasy Tactics Advance* (GBA) Flash 64K / 128K wear-leveled save files for handheld consoles (Analogue Pocket, Miyoo, Anbernic) and PC emulators.
 
-Zero external dependencies required. Built purely with the standard Python library.
+Zero external dependencies required. Built with Python 3.10+ standard library.
+
+---
+
+## Documentation Links
+
+- [Clan Strategy & Equipment Metagame](docs/clan-strategy.md): Build rationale, combat gear upgrades, and MP mechanics.
+- [Save Architecture & Internals](docs/save-architecture.md): Flash wear-leveling, CRC32, and 0x108 unit memory layout.
+- [Analogue Pocket & Handheld Guide](docs/pocket-and-handhelds.md): openFPGA folder layouts and sync best practices.
+- [Support & Diagnostics Suite](support/README.md): Automated save validator, race fleet generator, and Pocket syncer.
 
 ---
 
 ## Quick Start (with `uv`)
 
-Run instantly without installing or touching system Python:
+Run directly without installation:
 
 ```bash
-git clone https://github.com/izaac/ffta-tool.git
-cd ffta-tool
 uv run ffta-tool
 ```
 
-Or install as an isolated CLI command into user space:
+Install as an isolated CLI command:
 
 ```bash
 uv tool install .
@@ -27,71 +34,72 @@ ffta-tool
 
 ## Standalone (No `uv`)
 
-Works on **any Linux, macOS, or Windows** system with Python 3.10+:
-
-### Linux & macOS
+Works on Linux, macOS, and Windows with Python 3.10+:
 
 ```bash
 chmod +x ffta_tool.py
 ./ffta_tool.py
 ```
 
-### Windows
+---
 
-1. Download and install [Python 3](https://www.python.org/downloads/) (check *"Add Python to PATH"* during install).
-2. Clone or download this repository.
-3. Open Command Prompt or PowerShell in the folder:
+## CLI Commands & Flags
 
-```powershell
-python ffta_tool.py
+```bash
+# View clan roster and save health (auto-detects save file)
+ffta-tool
+
+# Master abilities and unlock advanced jobs for recruits
+ffta-tool --patch-units
+
+# Target specific recruit index (0..23)
+ffta-tool --patch-units --unit 5
+
+# Create timestamped snapshot backup
+ffta-tool --backup
+
+# Apply Super Starter package (10x all 361 weapons and 99x consumables)
+ffta-tool --super-starter --slot 2
+
+# Clear yellow and red cards and pardon jailed units
+ffta-tool --clear-cards --slot 2
+
+# Repair corrupt CRC32 checksum
+ffta-tool path/to/save.sav --fix-crc --slot 2
 ```
 
 ---
 
-## Usage
+## Support Automation Suite
 
-You can use either `ffta-tool` (via uv) or `./ffta_tool.py`:
+Automated diagnostic and fleet management scripts live in `support/`:
 
 ```bash
-# 1. View Clan Roster & Save Health (Auto-detects SD card or local save)
-ffta-tool
+# 1. Full save health check across local and Pocket saves
+uv run python support/validate_saves.py
 
-# 2. Master skills & unlock advanced jobs for all clan recruits
-ffta-tool --patch-units
+# 2. Non-destructive clan unit top-up (preserves high speed, maxes stats and meta gear)
+uv run python support/topup_clan_units.py --sync
 
-# 3. Target a single recruit by unit index (0..23)
-ffta-tool --patch-units --unit 5
+# 3. Generate canonical race fleets (Hume, Bangaa, Moogle, Viera, Nu Mou)
+uv run python support/generate_race_save.py nu_mou --sync
 
-# 4. Create an instant timestamped backup
-ffta-tool --backup
+# 4. Sync ROMs and saves to Analogue Pocket SD card
+uv run python support/sync_pocket.py
 
-# 5. Apply Super Starter package (10x all 361 weapons & 99x consumables)
-ffta-tool --super-starter --slot 2
-
-# 6. Clear all yellow and red cards for clan members
-ffta-tool --clear-cards --slot 2
-
-# 7. Fix corrupt save checksum (CRC32)
-ffta-tool path/to/save.sav --fix-crc --slot 2
-
-# 8. Run with custom TOML configuration file
-ffta-tool --config path/to/my_config.toml
+# 5. Inspect ROM tables, job growths, item stats, and recruit names
+uv run python support/inspect_rom.py --job "Sage"
 ```
-
-> **Safety Guard**: `--super-starter` resets mission progress to 0 and overwrites bag inventory. Saves with cleared missions are blocked automatically unless `-f` / `--force` is provided.
 
 ---
 
 ## Configuration (`config.toml`)
 
-You can customize default paths, search directories, and tool settings in a TOML configuration file.
-
-Copy `config.example.toml` to `config.toml` in your working directory or `~/.config/ffta-tool/config.toml`:
+Copy `config.example.toml` to `config.toml` or `~/.config/ffta-tool/config.toml`:
 
 ```toml
 [paths]
 backup_dir = "~/Documents/FFTA_Backups"
-# save_file = "/path/to/custom/save.sav"
 search_paths = [
     "/run/media/*/*/Saves/GBA/*Final Fantasy Tactics Advance*.sav",
     "~/Documents/FFTA_Backups/*.sav",
@@ -105,50 +113,18 @@ item_qty = 99
 backup = true
 ```
 
-Command-line options always override configuration values.
-
 ---
 
-## Example Starter Save
+## Verification & Tests
 
-A pristine demonstration save file is included in `examples/FFTA_Super_Starter.sav`:
-
-- **Slot 1 (Vanilla Starter)**: 100% clean Cyril starter state, 0 missions cleared, default starter recruits, equipment, and abilities.
-- **Slot 2 (Super Starter)**: Clean Cyril starter state, 0 missions cleared, 10x all 361 weapons and gear, 99x consumables, and all starting recruit abilities mastered.
-- **Checksums**: Fully verified internal CRC32 on both slots.
-
----
-
-## ROM Compatibility & Verification
-
-Tested and verified against the standard No-Intro release:
-
-| Field | Value |
-|---|---|
-| **Release** | Final Fantasy Tactics Advance (USA, Australia) |
-| **Serial / Product ID** | `AGB-AFXE-USA` |
-| **MD5** | `cd99cdde3d45554c1b36fbeb8863b7bd` |
-| **SHA-1** | `4ac05441f4de70a4ec3dd932116346c61b8783d9` |
-| **CRC32** | `5645e56c` |
-
----
-
-## Testing & Development
-
-Run built-in tests:
+Run test suite:
 
 ```bash
 uv run python -m unittest discover -s tests
 ```
 
-Check code style with Ruff:
+Check code style:
 
 ```bash
-uvx ruff check && uvx ruff format --check
+uvx ruff check .
 ```
-
----
-
-## Handheld Note
-
-Close or exit the emulator on your handheld before replacing or updating save files on the SD card so the device loads fresh data from disk.
