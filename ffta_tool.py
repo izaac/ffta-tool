@@ -19,9 +19,13 @@ from core.config import (
     parse_simple_toml,
 )
 from core.patcher import (
+    MONSTER_SPECIES,
     clear_clan_cards,
+    inject_monster_bank,
+    pack_monster_stats,
     patch_clan_units,
     patch_super_starter,
+    unpack_monster_stats,
 )
 from core.roster import (
     display_roster,
@@ -93,16 +97,20 @@ __all__ = [
     "get_name_id_by_str",
     "get_slots",
     "get_unit_name",
+    "inject_monster_bank",
     "inject_unit",
     "inspect_save",
     "load_builds",
     "load_config",
     "main",
+    "MONSTER_SPECIES",
+    "pack_monster_stats",
     "parse_simple_toml",
     "patch_clan_units",
     "patch_super_starter",
     "rename_unit",
     "resolve_job_and_race",
+    "unpack_monster_stats",
 ]
 
 if __name__ == "__main__":

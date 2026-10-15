@@ -99,6 +99,14 @@ def validate_save_file(path: str, verbose: bool = True) -> bool:
                 print(f"           Gear: {gear_names}")
 
         print(f"  Active Clan Units: {active_units} / 24")
+        sec2_off = info["sectors"][2] * SECTOR_SIZE
+        bank_addr = sec2_off + 0x0E78
+        active_monsters = sum(
+            1
+            for m in range(20)
+            if struct.unpack("<I", data[bank_addr + m * 16 : bank_addr + m * 16 + 4])[0] != 0
+        )
+        print(f"  Monster Bank:      {active_monsters} / 20 monsters captured")
 
     return file_clean
 

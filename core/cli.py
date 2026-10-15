@@ -6,7 +6,12 @@ import sys
 
 from .builder import equip_unit_build, inject_unit, rename_unit
 from .config import load_config
-from .patcher import clear_clan_cards, patch_clan_units, patch_super_starter
+from .patcher import (
+    clear_clan_cards,
+    inject_monster_bank,
+    patch_clan_units,
+    patch_super_starter,
+)
 from .roster import inspect_save
 from .save import atomic_write, auto_detect_save, create_snapshot_backup, fix_crc
 
@@ -86,6 +91,12 @@ Examples:
         "--clear-cards",
         action="store_true",
         help="Clear all yellow and red cards for clan members",
+    )
+    parser.add_argument(
+        "-m",
+        "--inject-monsters",
+        action="store_true",
+        help="Populate Cyril Monster Bank with all 20 monsters (Lv 99, 100 Affection, 999 stats) to unlock Morpher abilities",
     )
     parser.add_argument(
         "--fix-crc",
@@ -200,6 +211,7 @@ Examples:
         args.patch_units
         or args.super_starter
         or args.clear_cards
+        or args.inject_monsters
         or args.fix_crc
         or args.re_equip
         or args.build
@@ -218,6 +230,8 @@ Examples:
             if args.super_starter
             else "inject_unit"
             if args.inject
+            else "inject_monsters"
+            if args.inject_monsters
             else "rename_unit"
             if args.rename
             else "patch_units"
@@ -267,6 +281,9 @@ Examples:
 
     if args.clear_cards and not args.patch_units and not args.super_starter and not args.inject:
         data = clear_clan_cards(data, target_slot=target_slot)
+
+    if args.inject_monsters and not args.super_starter:
+        data = inject_monster_bank(data, target_slot=target_slot)
 
     if (args.re_equip or args.build) and not args.patch_units and not args.super_starter and not args.inject:
         data = equip_unit_build(

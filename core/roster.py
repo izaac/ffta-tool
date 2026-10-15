@@ -52,6 +52,16 @@ def inspect_save(sav_data: bytearray | bytes, show_roster: bool = True):
         print(f"      Missions Cleared: {info['missions']}")
         print(f"      Stored CRC32:     {hex(info['stored_crc'])} ({status})")
 
+        # Monster Bank check (Sector 2, offset 0x0E78)
+        sec2_idx = info["sectors"][2]
+        bank_addr = sec2_idx * SECTOR_SIZE + 0x0E78
+        bank_count = sum(
+            1
+            for m in range(20)
+            if struct.unpack("<I", sav_data[bank_addr + m * 16 : bank_addr + m * 16 + 4])[0] != 0
+        )
+        print(f"      Monster Bank:     {bank_count} / 20 monsters captured")
+
         if show_roster:
             display_roster(sav_data, info)
 

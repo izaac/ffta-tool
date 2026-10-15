@@ -67,3 +67,48 @@ Save validity is guarded by a standard CRC32 computed across the physical sector
 
 - Before hashing, the 4 checksum bytes at `0x0C..0x10` are treated as zero.
 - If the computed CRC does not match `hdr[0x0C:0x10]`, the game rejects the save sector as corrupt and attempts fallback to older sectors.
+
+---
+
+## 4. Monster Bank Storage Structure (Sector 2)
+
+Cyril's Monster Bank stores captured creatures across 20 fixed pens in Sector 2 starting at offset `0x0E78` (save buffer address `0x2E78`, RAM address `0x02002E78`). Each pen occupies exactly 16 (`0x10`) bytes (320 bytes total for all 20 pens):
+
+| Pen Index | Monster Species | Family |
+| --- | --- | --- |
+| 0 | Goblin | Goblinkind |
+| 1 | Red Cap | Goblinkind |
+| 2 | Jelly | Flankind |
+| 3 | Ice Flan | Flankind |
+| 4 | Cream | Flankind |
+| 5 | Bomb | Bombkind |
+| 6 | Grenade | Bombkind |
+| 7 | Icedrake | Dragonkind |
+| 8 | Firewyrm | Dragonkind |
+| 9 | Thundrake | Dragonkind |
+| 10 | Lamia | Lamiakind |
+| 11 | Lilith | Lamiakind |
+| 12 | Antlion | Bugaboo / Antlionkind |
+| 13 | Jawbreaker | Bugaboo / Antlionkind |
+| 14 | Red Panther | Pantherkind |
+| 15 | Coeurl | Pantherkind |
+| 16 | Malboro | Malborokind |
+| 17 | Big Malboro | Malborokind |
+| 18 | Floateye | Ahrimankind |
+| 19 | Ahriman | Ahrimankind |
+
+### Monster Record Layout (16 Bytes)
+
+| Offset | Size | Type | Description |
+| --- | --- | --- | --- |
+| `0x00..0x02` | 2 B | uint16 | Recruit Name ID (maps into ROM recruit name table) |
+| `0x02..0x04` | 2 B | uint16 | Status flags (`0x0856` marks specimen captured & active) |
+| `0x04` | 1 B | uint8 | Specimen active flag (`0x01` = Active) |
+| `0x05` | 1 B | uint8 | Specimen Level (1..99) |
+| `0x06` | 1 B | uint8 | Reserved / padding (`0x00`) |
+| `0x07` | 1 B | uint8 | Affection level (0..100; 100 grants 100% Morpher stat transfer) |
+| `0x08..0x10` | 8 B | bitstream | Six packed 10-bit combat stats (HP, MP, W-Atk, W-Def, M-Pow, M-Res) |
+
+### Morpher In-Battle Transformation Check
+
+When a Morpher executes the Morph command in combat, the battle engine inspects the candidate pens for that monster family at `0x02002E78 + pen * 16`. If the first 4 bytes of all candidate pens evaluate to zero (`0x00000000`), the Morph command for that creature family is disabled and greyed out. Populating the pens enables all Morph transformations immediately.

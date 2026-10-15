@@ -19,6 +19,7 @@ import sys
 sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), "..")))
 
 from core.builder import equip_unit_build
+from core.patcher import inject_monster_bank
 from core.save import (
     SECTOR_SIZE,
     atomic_write,
@@ -202,7 +203,11 @@ def topup_save(
             bump_counter=False,
         )
 
-    # 3. Increment wear-leveling sequence counter and recompute CRC
+    # 3. Populate Monster Bank with all 20 monsters
+    print("\n[*] Populating Cyril Monster Bank with all 20 monsters...")
+    inject_monster_bank(sav_data, target_slot=target_slot, bump_counter=False)
+
+    # 4. Increment wear-leveling sequence counter and recompute CRC
     hdr_sec = info["sectors"][0]
     hdr_off = hdr_sec * SECTOR_SIZE
     new_counter = info["counter"] + 1

@@ -202,8 +202,120 @@ def patch_super_starter(
         f"and {len(CONSUMABLE_IDS)} consumables ({item_qty}x)."
     )
 
-    # 5. Recalculate CRC32
+    # 5. Populate Monster Bank with all 20 monsters
+    inject_monster_bank(sav_data, target_slot=target_slot, bump_counter=False)
+
+    # 6. Recalculate CRC32
     new_crc = compute_crc(sav_data, secs)
     sav_data[hdr_offset + 0x0C : hdr_offset + 0x10] = struct.pack("<I", new_crc)
     print(f"  [+] Super Starter complete. Checksum: {hex(new_crc)}")
     return sav_data
+
+
+MONSTER_SPECIES = (
+    "Goblin",
+    "Red Cap",
+    "Jelly",
+    "Ice Flan",
+    "Cream",
+    "Bomb",
+    "Grenade",
+    "Icedrake",
+    "Firewyrm",
+    "Thundrake",
+    "Lamia",
+    "Lilith",
+    "Antlion",
+    "Jawbreaker",
+    "Red Panther",
+    "Coeurl",
+    "Malboro",
+    "Big Malboro",
+    "Floateye",
+    "Ahriman",
+)
+
+
+def pack_monster_stats(
+    hp: int = 999,
+    mp: int = 999,
+    watk: int = 999,
+    wdef: int = 999,
+    mpow: int = 999,
+    mres: int = 999,
+) -> bytes:
+    """Packs six 10-bit combat stats into 8 bytes matching FFTA Monster Bank bitstream."""
+    b = bytearray(8)
+    b[0] = hp & 0xFF
+    b[1] = ((hp >> 8) & 3) | ((mp & 0x3F) << 2)
+    b[2] = ((mp >> 6) & 0xF) | ((watk & 0xF) << 4)
+    b[3] = ((watk >> 4) & 0x7F) | ((wdef & 1) << 7)
+    b[4] = (wdef >> 1) & 0xFF
+    b[5] = ((wdef >> 9) & 1) | ((mpow & 0x3F) << 2)
+    b[6] = ((mpow >> 6) & 0x1F) | ((mres & 7) << 5)
+    b[7] = (mres >> 3) & 0xFF
+    return bytes(b)
+
+
+def unpack_monster_stats(b: bytes) -> tuple[int, int, int, int, int, int]:
+    """Unpacks 8 bytes into (hp, mp, watk, wdef, mpow, mres)."""
+    hp = b[0] | ((b[1] & 3) << 8)
+    mp = (b[1] >> 2) | ((b[2] & 0xF) << 6)
+    watk = (b[2] >> 4) | ((b[3] & 0x7F) << 4)
+    wdef = (b[3] >> 7) | (b[4] << 1) | ((b[5] & 1) << 9)
+    mpow = (b[5] >> 2) | ((b[6] & 0x1F) << 6)
+    mres = (b[6] >> 5) | (b[7] << 3)
+    return hp, mp, watk, wdef, mpow, mres
+
+
+def inject_monster_bank(
+    sav_data: bytearray,
+    target_slot: int = 1,
+    level: int = 99,
+    affection: int = 100,
+    stats: int = 999,
+    bump_counter: bool = True,
+) -> bytearray:
+    """Injects all 20 capturable monsters into Cyril's Monster Bank with maxed stats."""
+    slots = get_slots(sav_data)
+    if target_slot not in slots:
+        raise ValueError(f"Slot {target_slot + 1} not found!")
+
+    info = slots[target_slot]
+    secs = info["sectors"]
+    hdr_sec = secs[0]
+    sec2 = secs[2]
+    hdr_offset = hdr_sec * SECTOR_SIZE
+    bank_offset = sec2 * SECTOR_SIZE + 0x0E78
+
+    stat_bytes = pack_monster_stats(stats, stats, stats, stats, stats, stats)
+
+    for i in range(20):
+        slot_addr = bank_offset + i * 16
+        # Byte 0..1: Name ID (maps to recruit name 1..20)
+        sav_data[slot_addr : slot_addr + 2] = (i + 1).to_bytes(2, "little")
+        # Byte 2..3: Status flags (0x0856 marks monster captured & active)
+        sav_data[slot_addr + 2 : slot_addr + 4] = b"\x56\x08"
+        # Byte 4: Active flag (0x01)
+        sav_data[slot_addr + 4] = 0x01
+        # Byte 5: Level (1..99)
+        sav_data[slot_addr + 5] = max(1, min(99, level))
+        # Byte 6: Reserved (0x00)
+        sav_data[slot_addr + 6] = 0x00
+        # Byte 7: Affection (0..100)
+        sav_data[slot_addr + 7] = max(0, min(100, affection))
+        # Byte 8..15: 6 packed 10-bit stats
+        sav_data[slot_addr + 8 : slot_addr + 16] = stat_bytes
+
+    print(f"  [+] Injected all 20 monsters into Monster Bank (Lv {level}, Affection {affection}, Stats {stats}).")
+
+    if bump_counter:
+        new_counter = info["counter"] + 1
+        sav_data[hdr_offset + 8 : hdr_offset + 12] = struct.pack("<I", new_counter)
+        new_crc = compute_crc(sav_data, secs)
+        sav_data[hdr_offset + 0x0C : hdr_offset + 0x10] = struct.pack("<I", new_crc)
+        print(f"  [+] Sequence counter incremented to: {new_counter}")
+        print(f"  [+] Checksum updated: {hex(new_crc)}")
+
+    return sav_data
+

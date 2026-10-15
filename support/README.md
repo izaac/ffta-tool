@@ -8,8 +8,8 @@ High-value automation and inspection scripts for *Final Fantasy Tactics Advance*
 
 | Script | Purpose | Key Flags |
 | --- | --- | --- |
-| [`validate_saves.py`](validate_saves.py) | Full health check across local and Pocket `.sav` files (CRCs, counters, units, equipment, duplicate skills, sprite glitches). | `--pocket`, `--all`, `[path]` |
-| [`topup_clan_units.py`](topup_clan_units.py) | Non-destructive clan unit top-up (preserves high speed, buffs sub-optimal stats to 115% god roll, equips meta gear). | `--slot`, `--units`, `--sync` |
+| [`validate_saves.py`](validate_saves.py) | Full health check across local and Pocket `.sav` files (CRCs, counters, units, equipment, duplicate skills, sprite glitches, Monster Bank). | `--pocket`, `--all`, `[path]` |
+| [`topup_clan_units.py`](topup_clan_units.py) | Non-destructive clan unit top-up (preserves high speed, buffs stats to 115% god roll, equips meta gear, populates Monster Bank). | `--slot`, `--units`, `--sync` |
 | [`generate_race_save.py`](generate_race_save.py) | Generates canonical race-specific `.sav` and `.gba` (Hume, Bangaa, Moogle, Viera, Nu Mou) with Lv 8 god stats and meta gear. | `<race>`, `--level`, `--sync` |
 | [`sync_pocket.py`](sync_pocket.py) | Syncs canonical ROMs and saves to Analogue Pocket SD card with MD5 deduplication and OS filesystem flushing (`sync`). | `-n` (`--dry-run`), `--pocket` |
 | [`inspect_rom.py`](inspect_rom.py) | Inspects ROM base stats/growths (`0x521A80`), item IDs, recruit names, and race ability mappings. | `--job`, `--item`, `--name`, `--races` |

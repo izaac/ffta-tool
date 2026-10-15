@@ -23,6 +23,7 @@ import sys
 sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), "..")))
 
 from core.builder import inject_unit
+from core.patcher import inject_monster_bank
 from core.save import SECTOR_SIZE, atomic_write, compute_crc, get_slots
 from mappings import (
     RACE_ABILITY_SPECS,
@@ -278,6 +279,10 @@ def generate_race_fleet(
     print(f"\n[*] Clearing {24 - total_active} trailing clan slots (Unit {total_active}..23)...")
     for u in range(total_active, 24):
         clear_unit_slot(sav_data, sec0_off, u)
+
+    # 6.5 Populate Monster Bank with all 20 monsters
+    print("\n[*] Populating Cyril Monster Bank with all 20 monsters...")
+    inject_monster_bank(sav_data, target_slot=target_slot, bump_counter=False)
 
     # 7. Update sequence counter and compute CRC32
     hdr_sec = info["sectors"][0]

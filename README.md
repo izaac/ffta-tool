@@ -64,6 +64,9 @@ ffta-tool --super-starter --slot 2
 # Clear yellow and red cards and pardon jailed units
 ffta-tool --clear-cards --slot 2
 
+# Populate Cyril Monster Bank with all 20 monsters (unlocks Morpher abilities)
+ffta-tool --inject-monsters --slot 2
+
 # Repair corrupt CRC32 checksum
 ffta-tool path/to/save.sav --fix-crc --slot 2
 ```
