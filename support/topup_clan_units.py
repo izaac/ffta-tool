@@ -153,6 +153,8 @@ def topup_save(
     target_slot: int = 1,  # Slot 2 (index 1)
     target_units: list[int] | None = None,
     sync: bool = False,
+    monster_level: int = 30,
+    monster_stats: int | None = None,
 ) -> bool:
     """Tops up clan units in the specified save slot."""
     if not os.path.exists(save_path):
@@ -205,7 +207,13 @@ def topup_save(
 
     # 3. Populate Monster Bank with all 20 monsters
     print("\n[*] Populating Cyril Monster Bank with all 20 monsters...")
-    inject_monster_bank(sav_data, target_slot=target_slot, bump_counter=False)
+    inject_monster_bank(
+        sav_data,
+        target_slot=target_slot,
+        level=monster_level,
+        stats=monster_stats,
+        bump_counter=False,
+    )
 
     # 4. Increment wear-leveling sequence counter and recompute CRC
     hdr_sec = info["sectors"][0]
@@ -242,6 +250,18 @@ def main():
         default="2,3,4,5,6,7,8,9,10",
         help="Comma-separated unit indices to top up (default: 2,3,4,5,6,7,8,9,10)",
     )
+    parser.add_argument(
+        "--monster-level",
+        type=int,
+        default=30,
+        help="Level for Cyril Monster Bank monsters (1..99, default: 30)",
+    )
+    parser.add_argument(
+        "--monster-stats",
+        type=int,
+        default=None,
+        help="Base stats for Cyril Monster Bank monsters (50..999, default: level * 10 or 300)",
+    )
     parser.add_argument("--sync", action="store_true", help="Sync to Analogue Pocket SD card")
     args = parser.parse_args()
 
@@ -251,6 +271,8 @@ def main():
         target_slot=args.slot - 1,
         target_units=unit_list,
         sync=args.sync,
+        monster_level=args.monster_level,
+        monster_stats=args.monster_stats,
     )
 
 

@@ -147,6 +147,8 @@ def patch_super_starter(
     item_qty: int = 99,
     counter_bump: int = 50,
     force: bool = False,
+    monster_level: int = 30,
+    monster_stats: int | None = None,
 ) -> bytearray:
     """Applies the complete Super Starter patch to the specified slot."""
     slots = get_slots(sav_data)
@@ -203,7 +205,13 @@ def patch_super_starter(
     )
 
     # 5. Populate Monster Bank with all 20 monsters
-    inject_monster_bank(sav_data, target_slot=target_slot, bump_counter=False)
+    inject_monster_bank(
+        sav_data,
+        target_slot=target_slot,
+        level=monster_level,
+        stats=monster_stats,
+        bump_counter=False,
+    )
 
     # 6. Recalculate CRC32
     new_crc = compute_crc(sav_data, secs)
@@ -271,12 +279,18 @@ def unpack_monster_stats(b: bytes) -> tuple[int, int, int, int, int, int]:
 def inject_monster_bank(
     sav_data: bytearray,
     target_slot: int = 1,
-    level: int = 99,
+    level: int = 30,
     affection: int = 100,
-    stats: int = 999,
+    stats: int | None = None,
+    hp: int | None = None,
+    mp: int | None = None,
+    watk: int | None = None,
+    wdef: int | None = None,
+    mpow: int | None = None,
+    mres: int | None = None,
     bump_counter: bool = True,
 ) -> bytearray:
-    """Injects all 20 capturable monsters into Cyril's Monster Bank with maxed stats."""
+    """Injects all 20 capturable monsters into Cyril's Monster Bank with custom or auto-scaled stats."""
     slots = get_slots(sav_data)
     if target_slot not in slots:
         raise ValueError(f"Slot {target_slot + 1} not found!")
@@ -288,7 +302,16 @@ def inject_monster_bank(
     hdr_offset = hdr_sec * SECTOR_SIZE
     bank_offset = sec2 * SECTOR_SIZE + 0x0E78
 
-    stat_bytes = pack_monster_stats(stats, stats, stats, stats, stats, stats)
+    lvl = max(1, min(99, level))
+    base_stat = stats if stats is not None else min(999, max(50, lvl * 10))
+    stat_hp = max(1, min(999, hp if hp is not None else base_stat))
+    stat_mp = max(0, min(999, mp if mp is not None else base_stat))
+    stat_watk = max(1, min(999, watk if watk is not None else base_stat))
+    stat_wdef = max(1, min(999, wdef if wdef is not None else base_stat))
+    stat_mpow = max(1, min(999, mpow if mpow is not None else base_stat))
+    stat_mres = max(1, min(999, mres if mres is not None else base_stat))
+
+    stat_bytes = pack_monster_stats(stat_hp, stat_mp, stat_watk, stat_wdef, stat_mpow, stat_mres)
 
     for i in range(20):
         slot_addr = bank_offset + i * 16
@@ -299,7 +322,7 @@ def inject_monster_bank(
         # Byte 4: Active flag (0x01)
         sav_data[slot_addr + 4] = 0x01
         # Byte 5: Level (1..99)
-        sav_data[slot_addr + 5] = max(1, min(99, level))
+        sav_data[slot_addr + 5] = lvl
         # Byte 6: Reserved (0x00)
         sav_data[slot_addr + 6] = 0x00
         # Byte 7: Affection (0..100)
@@ -307,7 +330,10 @@ def inject_monster_bank(
         # Byte 8..15: 6 packed 10-bit stats
         sav_data[slot_addr + 8 : slot_addr + 16] = stat_bytes
 
-    print(f"  [+] Injected all 20 monsters into Monster Bank (Lv {level}, Affection {affection}, Stats {stats}).")
+    print(
+        f"  [+] Injected all 20 monsters into Monster Bank (Lv {lvl}, Affection {affection}, "
+        f"Stats HP:{stat_hp}/MP:{stat_mp}/Atk:{stat_watk}/Def:{stat_wdef}/Pow:{stat_mpow}/Res:{stat_mres})."
+    )
 
     if bump_counter:
         new_counter = info["counter"] + 1

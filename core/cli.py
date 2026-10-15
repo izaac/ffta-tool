@@ -96,7 +96,25 @@ Examples:
         "-m",
         "--inject-monsters",
         action="store_true",
-        help="Populate Cyril Monster Bank with all 20 monsters (Lv 99, 100 Affection, 999 stats) to unlock Morpher abilities",
+        help="Populate Cyril Monster Bank with all 20 monsters to unlock Morpher abilities",
+    )
+    parser.add_argument(
+        "--monster-level",
+        type=int,
+        default=None,
+        help="Monster level for Cyril Monster Bank (1..99, default: 30)",
+    )
+    parser.add_argument(
+        "--monster-stats",
+        type=int,
+        default=None,
+        help="Base stats for Cyril Monster Bank (50..999, default: level * 10 or 300)",
+    )
+    parser.add_argument(
+        "--monster-affection",
+        type=int,
+        default=100,
+        help="Monster affection for Cyril Monster Bank (0..100, default: 100)",
     )
     parser.add_argument(
         "--fix-crc",
@@ -206,12 +224,18 @@ Examples:
 
     target_slot = args.slot - 1
 
+    monster_bank_action = (
+        args.inject_monsters
+        or args.monster_level is not None
+        or args.monster_stats is not None
+    )
+
     # Default action: Inspect
     is_modifying = (
         args.patch_units
         or args.super_starter
         or args.clear_cards
-        or args.inject_monsters
+        or monster_bank_action
         or args.fix_crc
         or args.re_equip
         or args.build
@@ -231,7 +255,7 @@ Examples:
             else "inject_unit"
             if args.inject
             else "inject_monsters"
-            if args.inject_monsters
+            if monster_bank_action
             else "rename_unit"
             if args.rename
             else "patch_units"
@@ -271,19 +295,29 @@ Examples:
         data = patch_clan_units(data, target_slot=target_slot, target_unit=args.unit)
 
     if args.super_starter:
+        m_lvl = args.monster_level if args.monster_level is not None else 30
         data = patch_super_starter(
             data,
             target_slot=target_slot,
             equip_qty=args.equip_qty,
             item_qty=args.item_qty,
             force=args.force,
+            monster_level=m_lvl,
+            monster_stats=args.monster_stats,
         )
 
     if args.clear_cards and not args.patch_units and not args.super_starter and not args.inject:
         data = clear_clan_cards(data, target_slot=target_slot)
 
-    if args.inject_monsters and not args.super_starter:
-        data = inject_monster_bank(data, target_slot=target_slot)
+    if monster_bank_action and not args.super_starter:
+        m_lvl = args.monster_level if args.monster_level is not None else 30
+        data = inject_monster_bank(
+            data,
+            target_slot=target_slot,
+            level=m_lvl,
+            affection=args.monster_affection,
+            stats=args.monster_stats,
+        )
 
     if (args.re_equip or args.build) and not args.patch_units and not args.super_starter and not args.inject:
         data = equip_unit_build(

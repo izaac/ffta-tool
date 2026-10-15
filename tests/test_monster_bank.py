@@ -105,6 +105,57 @@ class TestMonsterBank(unittest.TestCase):
             self.assertEqual(affection, 100)
             self.assertEqual(unpack_monster_stats(stat_bytes), (999, 999, 999, 999, 999, 999))
 
+    def test_inject_monster_bank_dynamic_level_and_stats(self):
+        """Verifies custom levels and auto-scaling / explicit stats."""
+        sav = self._create_mock_save()
+
+        # 1. Default dynamic values: level 30, auto-scaled stats 300
+        patched_default = inject_monster_bank(sav, target_slot=1)
+        sec2_off = 6 * SECTOR_SIZE
+        bank_addr = sec2_off + 0x0E78
+        pen0_lvl = patched_default[bank_addr + 5]
+        pen0_aff = patched_default[bank_addr + 7]
+        pen0_stats = unpack_monster_stats(patched_default[bank_addr + 8 : bank_addr + 16])
+
+        self.assertEqual(pen0_lvl, 30)
+        self.assertEqual(pen0_aff, 100)
+        self.assertEqual(pen0_stats, (300, 300, 300, 300, 300, 300))
+
+        # 2. Custom level and explicit stats
+        patched_custom = inject_monster_bank(sav, target_slot=1, level=45, stats=420, affection=85)
+        pen0_lvl = patched_custom[bank_addr + 5]
+        pen0_aff = patched_custom[bank_addr + 7]
+        pen0_stats = unpack_monster_stats(patched_custom[bank_addr + 8 : bank_addr + 16])
+
+        self.assertEqual(pen0_lvl, 45)
+        self.assertEqual(pen0_aff, 85)
+        self.assertEqual(pen0_stats, (420, 420, 420, 420, 420, 420))
+
+    def test_inject_monster_bank_stat_overrides_and_clamping(self):
+        """Verifies individual stat overrides and level/stat clamping."""
+        sav = self._create_mock_save()
+        sec2_off = 6 * SECTOR_SIZE
+        bank_addr = sec2_off + 0x0E78
+
+        # 1. Individual overrides
+        patched = inject_monster_bank(sav, target_slot=1, level=50, stats=500, hp=750, watk=650)
+        pen0_stats = unpack_monster_stats(patched[bank_addr + 8 : bank_addr + 16])
+        self.assertEqual(pen0_stats, (750, 500, 650, 500, 500, 500))
+
+        # 2. Upper clamping
+        patched_max = inject_monster_bank(sav, target_slot=1, level=150, stats=2000)
+        pen0_lvl = patched_max[bank_addr + 5]
+        pen0_stats = unpack_monster_stats(patched_max[bank_addr + 8 : bank_addr + 16])
+        self.assertEqual(pen0_lvl, 99)
+        self.assertEqual(pen0_stats, (999, 999, 999, 999, 999, 999))
+
+        # 3. Lower clamping
+        patched_min = inject_monster_bank(sav, target_slot=1, level=0, stats=-5)
+        pen0_lvl = patched_min[bank_addr + 5]
+        pen0_stats = unpack_monster_stats(patched_min[bank_addr + 8 : bank_addr + 16])
+        self.assertEqual(pen0_lvl, 1)
+        self.assertEqual(pen0_stats, (1, 0, 1, 1, 1, 1))
+
     def test_inject_monster_bank_invalid_slot(self):
         """Raises ValueError if target slot is not present in save."""
         sav = bytearray(0x10000)
