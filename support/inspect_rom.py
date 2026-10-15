@@ -28,8 +28,12 @@ from mappings import (
     RACE_NAMES,
     RECRUIT_NAMES,
 )
+from support.sync_pocket import DEFAULT_ASSET_DIR
 
-DEFAULT_ROM_PATH = "/home/izaac/Documents/FFTA_Assets/Final Fantasy Tactics Advance (U) [!].gba"
+DEFAULT_ROM_PATH = os.environ.get(
+    "FFTA_ROM_PATH",
+    os.path.join(DEFAULT_ASSET_DIR, "Final Fantasy Tactics Advance (U) [!].gba"),
+)
 
 
 def inspect_jobs(query: str | None = None):

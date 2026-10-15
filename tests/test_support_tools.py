@@ -41,8 +41,10 @@ class TestSupportTools(unittest.TestCase):
 
     def test_generate_race_fleet_temp(self):
         """Verifies fleet generator for Nu Mou into a temporary directory."""
-        base_sav = "/home/izaac/Documents/FFTA_Assets/Final Fantasy Tactics Advance (U) [!].sav"
-        base_rom = "/home/izaac/Documents/FFTA_Assets/Final Fantasy Tactics Advance (U) [!].gba"
+        from support.sync_pocket import DEFAULT_ASSET_DIR
+
+        base_sav = os.path.join(DEFAULT_ASSET_DIR, "Final Fantasy Tactics Advance (U) [!].sav")
+        base_rom = os.path.join(DEFAULT_ASSET_DIR, "Final Fantasy Tactics Advance (U) [!].gba")
         if not os.path.exists(base_sav) or not os.path.exists(base_rom):
             self.skipTest("Base assets not found in environment.")
 
@@ -65,9 +67,10 @@ class TestSupportTools(unittest.TestCase):
         """Verifies topup_save on a temporary copy of base save."""
         import shutil
 
+        from support.sync_pocket import DEFAULT_ASSET_DIR
         from support.topup_clan_units import topup_save
 
-        base_sav = "/home/izaac/Documents/FFTA_Assets/Final Fantasy Tactics Advance (U) [!].sav"
+        base_sav = os.path.join(DEFAULT_ASSET_DIR, "Final Fantasy Tactics Advance (U) [!].sav")
         if not os.path.exists(base_sav):
             self.skipTest("Base save not found in environment.")
 

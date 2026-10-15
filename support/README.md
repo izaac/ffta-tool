@@ -29,7 +29,7 @@ uv run python support/validate_saves.py
 uv run python support/validate_saves.py --pocket
 
 # Inspect a specific save file
-uv run python support/validate_saves.py "/home/izaac/Documents/FFTA_Assets/Final Fantasy Tactics Advance (Bangaa).sav"
+uv run python support/validate_saves.py "path/to/Final Fantasy Tactics Advance (Bangaa).sav"
 ```
 
 ### 2. Generate Race Save Fleets

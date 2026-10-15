@@ -11,11 +11,39 @@ import os
 import shutil
 import sys
 
-DEFAULT_ASSET_DIR = "/home/izaac/Documents/FFTA_Assets"
-DEFAULT_POCKET_BASE = "/run/media/izaac/POCKET"
-POCKET_ROMS_DIR = os.path.join(DEFAULT_POCKET_BASE, "Assets/gba/common")
-POCKET_SAVES_DIR = os.path.join(DEFAULT_POCKET_BASE, "Saves/gba")
-POCKET_SAVES_COMMON_DIR = os.path.join(DEFAULT_POCKET_BASE, "Saves/gba/common")
+DEFAULT_ASSET_DIR = os.environ.get(
+    "FFTA_ASSET_DIR",
+    os.path.expanduser("~/Documents/FFTA_Assets"),
+)
+
+
+def find_pocket_base() -> str:
+    """Dynamically locates the Analogue Pocket SD card mount point."""
+    if "POCKET_DIR" in os.environ and os.path.exists(os.environ["POCKET_DIR"]):
+        return os.environ["POCKET_DIR"]
+
+    for mount_root in ["/run/media", "/media", "/mnt", "/Volumes"]:
+        if os.path.exists(mount_root):
+            try:
+                for entry in os.listdir(mount_root):
+                    # Direct mount (e.g. /Volumes/POCKET)
+                    if entry.upper() == "POCKET":
+                        p = os.path.join(mount_root, entry)
+                        if os.path.isdir(p):
+                            return p
+                    # Sub-user mount (e.g. /run/media/<user>/POCKET)
+                    sub = os.path.join(mount_root, entry)
+                    if os.path.isdir(sub):
+                        p = os.path.join(sub, "POCKET")
+                        if os.path.exists(p) and os.path.isdir(p):
+                            return p
+            except OSError:
+                continue
+
+    return os.environ.get("POCKET_DIR", "/Volumes/POCKET")
+
+
+DEFAULT_POCKET_BASE = find_pocket_base()
 
 
 def get_file_md5(path: str) -> str:

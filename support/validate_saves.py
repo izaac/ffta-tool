@@ -15,9 +15,9 @@ sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), "..")
 
 from core.save import SECTOR_SIZE, get_slots
 from mappings import JOB_NAMES, KNOWN_ITEMS, get_unit_name
+from support.sync_pocket import DEFAULT_ASSET_DIR, DEFAULT_POCKET_BASE
 
-DEFAULT_ASSET_DIR = "/home/izaac/Documents/FFTA_Assets"
-DEFAULT_POCKET_DIR = "/run/media/izaac/POCKET/Saves/gba"
+DEFAULT_POCKET_DIR = os.path.join(DEFAULT_POCKET_BASE, "Saves/gba")
 
 
 def validate_save_file(path: str, verbose: bool = True) -> bool:

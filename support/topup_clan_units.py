@@ -38,10 +38,13 @@ from mappings import (
     compute_god_stats,
     get_unit_name,
 )
-from support.sync_pocket import sync_pocket
+from support.sync_pocket import DEFAULT_ASSET_DIR, sync_pocket
 from support.validate_saves import validate_save_file
 
-DEFAULT_SAVE_PATH = "/home/izaac/Documents/FFTA_Assets/Final Fantasy Tactics Advance (U) [!].sav"
+DEFAULT_SAVE_PATH = os.environ.get(
+    "FFTA_SAVE_PATH",
+    os.path.join(DEFAULT_ASSET_DIR, "Final Fantasy Tactics Advance (U) [!].sav"),
+)
 BUILDS_PATH = os.path.abspath(os.path.join(os.path.dirname(__file__), "..", "builds.toml"))
 
 

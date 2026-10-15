@@ -29,10 +29,9 @@ from mappings import (
     RACE_JOB_COUNTERS,
     compute_god_stats,
 )
-from support.sync_pocket import sync_pocket
+from support.sync_pocket import DEFAULT_ASSET_DIR, sync_pocket
 from support.validate_saves import validate_save_file
 
-DEFAULT_ASSET_DIR = "/home/izaac/Documents/FFTA_Assets"
 DEFAULT_BASE_SAV = os.path.join(DEFAULT_ASSET_DIR, "Final Fantasy Tactics Advance (U) [!].sav")
 DEFAULT_BASE_ROM = os.path.join(DEFAULT_ASSET_DIR, "Final Fantasy Tactics Advance (U) [!].gba")
 BUILDS_PATH = os.path.abspath(os.path.join(os.path.dirname(__file__), "..", "builds.toml"))

@@ -754,7 +754,7 @@ class TestFftaTool(unittest.TestCase):
         os.path.exists(
             os.environ.get(
                 "FFTA_ROM_PATH",
-                "/home/izaac/Documents/FFTA_Assets/Final Fantasy Tactics Advance (U) [!].gba",
+                os.path.expanduser("~/Documents/FFTA_Assets/Final Fantasy Tactics Advance (U) [!].gba"),
             )
         ),
         "Local ROM file not present; skipping live ROM binary verification",
@@ -763,7 +763,7 @@ class TestFftaTool(unittest.TestCase):
         """Optionally validates embedded tables match local GBA ROM when present."""
         rom_path = os.environ.get(
             "FFTA_ROM_PATH",
-            "/home/izaac/Documents/FFTA_Assets/Final Fantasy Tactics Advance (U) [!].gba",
+            os.path.expanduser("~/Documents/FFTA_Assets/Final Fantasy Tactics Advance (U) [!].gba"),
         )
         with open(rom_path, "rb") as f:
             rom = f.read()
