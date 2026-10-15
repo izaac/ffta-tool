@@ -539,7 +539,7 @@ DEFAULT_COMBO_IDS: dict[int, int] = {1: 117, 2: 43, 3: 94, 4: 74, 5: 31}
 
 # Base stats and growths per job (extracted directly from GBA ROM table at 0x521A14)
 # Tuple layout: (base_hp, base_mp, base_speed, base_watk, base_wdef, base_mpow, base_mres,
-#                hp_grow, mp_grow, watk_grow, wdef_grow, mpow_grow, mres_grow, spd_grow)
+#                hp_grow, spd_grow, watk_grow, wdef_grow, mpow_grow, mres_grow, mp_grow)
 JOB_STAT_TABLE: dict[int, tuple[float, ...]] = {
     0x01: (88, 14, 100, 84, 79, 54, 64, 0.5, 1.1, 8.8, 8.8, 6.0, 7.2, 1.1),
     0x02: (88, 14, 100, 84, 79, 54, 64, 0.5, 1.1, 8.8, 8.8, 6.0, 7.2, 1.1),
@@ -593,8 +593,8 @@ def compute_god_stats(job_id: int, level: int = 8) -> dict[str, int]:
     lvl = max(0, level - 1)
     return {
         "hp": int(st[0] * 1.15 + lvl * st[7] * 10),
-        "mp": int(st[1] * 1.15 + lvl * st[8] * 3),
-        "speed": int(st[2] * 1.15 + lvl * st[13]),
+        "mp": int(st[1] * 1.15 + lvl * st[13]),
+        "speed": int(st[2] * 1.15 + lvl * st[8]),
         "watk": int(st[3] * 1.15 + lvl * st[9]),
         "wdef": int(st[4] * 1.15 + lvl * st[10]),
         "mpow": int(st[5] * 1.15 + lvl * st[11]),

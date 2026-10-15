@@ -528,8 +528,8 @@ class TestFftaTool(unittest.TestCase):
         # Test Job 0x1A (Nu Mou Morpher) at Level 8
         stats = compute_god_stats(0x1A, level=8)
         self.assertEqual(stats["hp"], 115)
-        self.assertEqual(stats["mp"], 70)
-        self.assertEqual(stats["speed"], 146)
+        self.assertEqual(stats["mp"], 56)
+        self.assertEqual(stats["speed"], 137)
         self.assertEqual(stats["watk"], 127)
         self.assertEqual(stats["wdef"], 131)
         self.assertEqual(stats["mpow"], 131)
@@ -537,7 +537,7 @@ class TestFftaTool(unittest.TestCase):
 
         # Test Job 0x22 (Viera Assassin) at Level 8
         stats_assassin = compute_god_stats(0x22, level=8)
-        self.assertEqual(stats_assassin["speed"], 180)
+        self.assertEqual(stats_assassin["speed"], 159)
         self.assertEqual(stats_assassin["hp"], 129)
 
     def test_name_helpers_and_generator(self):
@@ -597,7 +597,7 @@ class TestFftaTool(unittest.TestCase):
         self.assertEqual(info["race"], "Nu Mou")
         self.assertEqual(info["job"], "Morpher")
         self.assertEqual(info["level"], 8)
-        self.assertEqual(info["stats"]["speed"], 146)
+        self.assertEqual(info["stats"]["speed"], 137)
 
         slots = get_slots(patched)
         self.assertTrue(slots[1]["valid"], "CRC must be valid after injection")
@@ -613,7 +613,7 @@ class TestFftaTool(unittest.TestCase):
 
         # Check speed stat at 0xD2:0xD4
         spd = struct.unpack("<H", patched[u5_off + 0xD2 : u5_off + 0xD4])[0]
-        self.assertEqual(spd, 146)
+        self.assertEqual(spd, 137)
 
         # Check Primary A-Ability Set at 0x35 (30 = Morph) and Secondary at 0x36
         self.assertEqual(patched[u5_off + 0x35], 30)
