@@ -135,7 +135,11 @@ def resolve_job_and_race(query: str, builds_path: str | None = None) -> tuple[in
             b_job = b_val.get("job", "").lower()
             b_race = b_val.get("race", "").lower()
             combined = f"{b_race} {b_job}".lower()
-            if clean in (b_key, b_name, b_job, combined) or norm_key in (b_key, b_job.replace(" ", "_")):
+            if clean in (b_key, b_name, b_job, combined) or norm_key in (
+                b_key,
+                b_job.replace(" ", "_"),
+                combined.replace(" ", "_"),
+            ):
                 selected_build = b_val
                 break
 
