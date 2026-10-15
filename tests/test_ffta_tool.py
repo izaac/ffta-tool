@@ -15,21 +15,29 @@ sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), "..")
 from ffta_tool import (
     MAGIC,
     RACE_JOB_COUNTERS,
+    RECRUIT_NAMES,
     SECTOR_SIZE,
     atomic_write,
     auto_detect_save,
     clear_clan_cards,
     compute_crc,
+    compute_god_stats,
     create_snapshot_backup,
     equip_unit_build,
     fix_crc,
+    generate_random_name,
     get_default_backup_dir,
+    get_name_id_by_str,
     get_slots,
+    get_unit_name,
+    inject_unit,
     load_builds,
     load_config,
     parse_simple_toml,
     patch_clan_units,
     patch_super_starter,
+    rename_unit,
+    resolve_job_and_race,
 )
 
 
@@ -514,6 +522,159 @@ class TestFftaTool(unittest.TestCase):
         # Gear should have been auto re-equipped from builds.toml
         expected_gear = struct.pack("<5H", 0x00C8, 0x012B, 0x0111, 0x015C, 0x0169)
         self.assertEqual(cleared[u1_off + 0x2A : u1_off + 0x34], expected_gear)
+
+    def test_compute_god_stats(self):
+        """Verifies compute_god_stats calculates optimal 115% top-rolled base stats and growths."""
+        # Test Job 0x1A (Nu Mou Morpher) at Level 8
+        stats = compute_god_stats(0x1A, level=8)
+        self.assertEqual(stats["hp"], 115)
+        self.assertEqual(stats["mp"], 70)
+        self.assertEqual(stats["speed"], 146)
+        self.assertEqual(stats["watk"], 127)
+        self.assertEqual(stats["wdef"], 131)
+        self.assertEqual(stats["mpow"], 131)
+        self.assertEqual(stats["mres"], 139)
+
+        # Test Job 0x22 (Viera Assassin) at Level 8
+        stats_assassin = compute_god_stats(0x22, level=8)
+        self.assertEqual(stats_assassin["speed"], 180)
+        self.assertEqual(stats_assassin["hp"], 129)
+
+    def test_name_helpers_and_generator(self):
+        """Verifies get_unit_name, get_name_id_by_str, and generate_random_name."""
+        self.assertEqual(len(RECRUIT_NAMES), 725)
+        self.assertEqual(get_unit_name(0, special_flag=2), "Marche")
+        self.assertEqual(get_unit_name(8, special_flag=8), "Montblanc")
+        self.assertEqual(get_unit_name(2, special_flag=1), "Isaac")
+        self.assertEqual(get_unit_name(156, special_flag=1), "Domenic")
+        self.assertEqual(get_unit_name(545, special_flag=1), "Kudhos")
+
+        self.assertEqual(get_name_id_by_str("Isaac"), 2)
+        self.assertEqual(get_name_id_by_str("domenic"), 156)
+        self.assertEqual(get_name_id_by_str("KUDHOS"), 545)
+        self.assertIsNone(get_name_id_by_str("NonExistentNameXYZ"))
+
+        # Verify Viera random name is within female pool (320..499)
+        viera_id, viera_name = generate_random_name(race_id=4)
+        self.assertTrue(320 <= viera_id < 500)
+        self.assertEqual(viera_name, RECRUIT_NAMES[viera_id])
+
+        # Verify excluded_ids prevents duplicate names
+        excluded = {156}
+        nu_mou_id, nu_mou_name = generate_random_name(race_id=3, excluded_ids=excluded)
+        self.assertNotIn(nu_mou_id, excluded)
+
+    def test_resolve_job_and_race(self):
+        """Verifies resolve_job_and_race handles builds and job names."""
+        # Build key from builds.toml
+        j_id, r_id, gear, title = resolve_job_and_race("morpher")
+        self.assertEqual(j_id, 0x1A)  # Morpher
+        self.assertEqual(r_id, 3)  # Nu Mou
+        self.assertEqual(gear[0], 0x00E8)  # Dragon Soul
+        self.assertIn("Morpher", title)
+
+        # Bangaa Dragoon
+        j_id, r_id, gear, title = resolve_job_and_race("dragoon")
+        self.assertEqual(j_id, 0x0F)
+        self.assertEqual(r_id, 2)
+        self.assertEqual(gear[0], 0x00C8)
+
+        # Raw job name without build entry
+        j_id, r_id, _, title = resolve_job_and_race("Bangaa Warrior")
+        self.assertEqual(j_id, 0x0D)
+        self.assertEqual(r_id, 2)
+
+        with self.assertRaises(ValueError):
+            resolve_job_and_race("invalid_job_xyz")
+
+    def test_inject_unit_auto_slot_and_god_stats(self):
+        """Verifies inject_unit auto-detects first free slot, sets god stats, mastered skills, and valid CRC."""
+        buf = bytearray(self.mock_data)
+        # Mock Slot 2 has units 0..4 occupied. Auto-detection should choose Unit 5.
+        patched, info = inject_unit(buf, build_or_job="morpher", target_slot=1, level=8)
+
+        self.assertEqual(info["unit_idx"], 5)
+        self.assertEqual(info["race"], "Nu Mou")
+        self.assertEqual(info["job"], "Morpher")
+        self.assertEqual(info["level"], 8)
+        self.assertEqual(info["stats"]["speed"], 146)
+
+        slots = get_slots(patched)
+        self.assertTrue(slots[1]["valid"], "CRC must be valid after injection")
+        self.assertEqual(slots[1]["counter"], 21)
+
+        # Check unit bytes in Slot 2 (Flash Sector 4)
+        u5_off = 4 * SECTOR_SIZE + 0x80 + 5 * 0x108
+        self.assertEqual(patched[u5_off + 0x04], 1)  # Special generic flag
+        self.assertEqual(patched[u5_off + 0x05], 0x1A)  # Sprite index
+        self.assertEqual(patched[u5_off + 0x06], 3)  # Race ID Nu Mou
+        self.assertEqual(patched[u5_off + 0x07], 0x1A)  # Job ID Morpher
+        self.assertEqual(patched[u5_off + 0x09], 8)  # Level 8
+
+        # Check speed stat at 0xD2:0xD4
+        spd = struct.unpack("<H", patched[u5_off + 0xD2 : u5_off + 0xD4])[0]
+        self.assertEqual(spd, 146)
+
+        # Check Primary A-Ability Set at 0x35 (30 = Morph) and Secondary at 0x36
+        self.assertEqual(patched[u5_off + 0x35], 30)
+        self.assertEqual(patched[u5_off + 0x36], 13)
+
+        # Check abilities mastered (94 Nu Mou skills + 12 Morpher souls)
+        self.assertTrue(all(patched[u5_off + 0x41 + i] == 0xE4 for i in range(94)))
+        self.assertTrue(all(patched[u5_off + 0x93 + i] == 0xE4 for i in range(12)))
+
+        # Check job unlock counters injected
+        self.assertEqual(bytes(patched[u5_off + 0xF1 : u5_off + 0x101]), RACE_JOB_COUNTERS[3][:16])
+
+        # Check unit state is active (0xFF)
+        self.assertEqual(patched[u5_off + 0x104], 0xFF)
+
+    def test_inject_unit_custom_name_and_slot(self):
+        """Verifies inject_unit with explicit unit slot index and custom name from ROM."""
+        buf = bytearray(self.mock_data)
+        patched, info = inject_unit(
+            buf,
+            build_or_job="assassin",
+            target_slot=1,
+            target_unit=7,
+            level=9,
+            name="Lisa",
+        )
+
+        self.assertEqual(info["unit_idx"], 7)
+        self.assertEqual(info["name"], "Lisa")
+        self.assertEqual(info["name_id"], 478)
+        self.assertEqual(info["job"], "Assassin")
+
+        u7_off = 4 * SECTOR_SIZE + 0x80 + 7 * 0x108
+        name_id = struct.unpack("<H", patched[u7_off : u7_off + 2])[0]
+        self.assertEqual(name_id, 478)
+
+    def test_inject_unit_clan_full_error(self):
+        """Verifies inject_unit raises ValueError if all 24 slots are occupied and no slot specified."""
+        buf = bytearray(self.mock_data)
+        s4_off = 4 * SECTOR_SIZE
+        # Mark all 24 units as level 1
+        for u in range(24):
+            buf[s4_off + 0x80 + u * 0x108 + 0x09] = 1
+
+        with self.assertRaises(ValueError) as ctx:
+            inject_unit(buf, build_or_job="morpher", target_slot=1)
+        self.assertIn("Clan is full", str(ctx.exception))
+
+    def test_rename_unit(self):
+        """Verifies rename_unit updates Name ID, increments counter, and updates CRC."""
+        buf = bytearray(self.mock_data)
+        # Rename unit 2 (Nu Mou) in Slot 2 to Kudhos
+        patched, new_name = rename_unit(buf, target_unit=2, new_name="Kudhos", target_slot=1)
+        self.assertEqual(new_name, "Kudhos")
+
+        u2_off = 4 * SECTOR_SIZE + 0x80 + 2 * 0x108
+        name_id = struct.unpack("<H", patched[u2_off : u2_off + 2])[0]
+        self.assertEqual(name_id, 545)
+
+        slots = get_slots(patched)
+        self.assertTrue(slots[1]["valid"], "CRC must be valid after renaming")
 
 
 if __name__ == "__main__":

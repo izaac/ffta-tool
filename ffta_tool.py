@@ -177,22 +177,46 @@ def get_default_backup_dir(custom_dir=None) -> Path:
 try:
     from mappings import (
         CONSUMABLE_IDS,
+        DEFAULT_COMBO_IDS,
+        DEFAULT_REACTION_IDS,
+        DEFAULT_SECONDARY_A_SETS,
+        DEFAULT_SECONDARY_JOBS,
+        DEFAULT_SUPPORT_IDS,
         EQUIPMENT_IDS,
         JOB_NAMES,
+        JOB_PRIMARY_A_SETS,
         KNOWN_ITEMS,
+        RACE_ABILITY_BASE,
         RACE_ABILITY_SPECS,
         RACE_JOB_COUNTERS,
         RACE_NAMES,
+        RECRUIT_NAMES,
+        compute_god_stats,
+        generate_random_name,
+        get_name_id_by_str,
+        get_unit_name,
     )
 except ImportError:
     from .mappings import (
         CONSUMABLE_IDS,
+        DEFAULT_COMBO_IDS,
+        DEFAULT_REACTION_IDS,
+        DEFAULT_SECONDARY_A_SETS,
+        DEFAULT_SECONDARY_JOBS,
+        DEFAULT_SUPPORT_IDS,
         EQUIPMENT_IDS,
         JOB_NAMES,
+        JOB_PRIMARY_A_SETS,
         KNOWN_ITEMS,
+        RACE_ABILITY_BASE,
         RACE_ABILITY_SPECS,
         RACE_JOB_COUNTERS,
         RACE_NAMES,
+        RECRUIT_NAMES,
+        compute_god_stats,
+        generate_random_name,
+        get_name_id_by_str,
+        get_unit_name,
     )
 
 
@@ -357,6 +381,8 @@ def display_roster(sav_data, slot_info):
         if u_off + 0x108 > len(sec0):
             break
         ub = sec0[u_off : u_off + 0x108]
+        name_id = struct.unpack("<H", ub[0x00:0x02])[0]
+        special_flag = ub[0x04]
         race_id = ub[0x06]
         job_id = ub[0x07]
         level = ub[0x09]
@@ -365,6 +391,7 @@ def display_roster(sav_data, slot_info):
         if level > 0 and race_id in RACE_NAMES:
             race = RACE_NAMES[race_id]
             job_name = JOB_NAMES.get(job_id, (f"Job#{job_id:02x}", race))[0]
+            unit_name = get_unit_name(name_id, special_flag=special_flag)
 
             # Abilities count (mastered abilities have bit 7 set in vanilla saves)
             spec = RACE_ABILITY_SPECS.get(race_id, (80, 0, False))
@@ -400,6 +427,7 @@ def display_roster(sav_data, slot_info):
             units.append(
                 {
                     "idx": u,
+                    "name": unit_name,
                     "race": race,
                     "job": job_name,
                     "level": level,
@@ -414,16 +442,16 @@ def display_roster(sav_data, slot_info):
         return
 
     print("\n      CLAN ROSTER:")
-    print("      +----+---------+--------------+-----+---------+----------+----------------------------+")
-    print("      | #  | Race    | Current Job  | Lv  | Skills  | Adv Jobs | Main Weapons / Key Items   |")
-    print("      +----+---------+--------------+-----+---------+----------+----------------------------+")
+    print("      +----+-----------+---------+--------------+-----+---------+----------+----------------------------+")
+    print("      | #  | Name      | Race    | Current Job  | Lv  | Skills  | Adv Jobs | Main Weapons / Key Items   |")
+    print("      +----+-----------+---------+--------------+-----+---------+----------+----------------------------+")
     for u in units:
         print(
-            f"      | {u['idx']:<2} | {u['race']:<7} | {u['job']:<12} | "
+            f"      | {u['idx']:<2} | {u['name']:<9} | {u['race']:<7} | {u['job']:<12} | "
             f"{u['level']:<3} | {u['learned']:<7} | {u['unlocked']:<8} | "
             f"{u['gear']:<26} |"
         )
-    print("      +----+---------+--------------+-----+---------+----------+----------------------------+")
+    print("      +----+-----------+---------+--------------+-----+---------+----------+----------------------------+")
 
 
 # ==============================================================================
@@ -598,6 +626,307 @@ def equip_unit_build(sav_data, target_slot=1, target_unit=None, build_key=None, 
         print(f"  [+] Checksum updated: {hex(new_crc)}")
 
     return sav_data
+
+
+def resolve_job_and_race(query: str, builds_path: str | None = None) -> tuple[int, int, list[int], str]:
+    """Resolves a build key or job string into (job_id, race_id, gear_list, display_name)."""
+    clean = query.strip().lower()
+    norm_key = clean.replace("-", "_").replace(" ", "_")
+
+    builds = load_builds(builds_path)
+    selected_build = None
+
+    # 1. Exact match in builds.toml by key
+    if norm_key in builds:
+        selected_build = builds[norm_key]
+    else:
+        # 2. Match in builds.toml by name or (race + job) or job
+        for b_key, b_val in builds.items():
+            b_name = b_val.get("name", "").lower()
+            b_job = b_val.get("job", "").lower()
+            b_race = b_val.get("race", "").lower()
+            combined = f"{b_race} {b_job}".lower()
+            if clean in (b_key, b_name, b_job, combined) or norm_key in (b_key, b_job.replace(" ", "_")):
+                selected_build = b_val
+                break
+
+    if selected_build:
+        b_race = selected_build.get("race", "")
+        b_job = selected_build.get("job", "")
+        race_id = next((r_id for r_id, r_name in RACE_NAMES.items() if r_name.lower() == b_race.lower()), None)
+        if race_id is None:
+            raise ValueError(f"Unknown race in build: {b_race}")
+        job_id = next(
+            (
+                j_id
+                for j_id, (j_name, j_race) in JOB_NAMES.items()
+                if j_name.lower() == b_job.lower() and j_race.lower() == b_race.lower()
+            ),
+            None,
+        )
+        if job_id is None:
+            raise ValueError(f"Unknown job in build: {b_job} ({b_race})")
+        gear = selected_build.get("gear", [0, 0, 0, 0, 0])
+        display_name = selected_build.get("name", f"{b_race} {b_job}")
+        return job_id, race_id, gear, display_name
+
+    # 3. Match against JOB_NAMES directly
+    # Check if query specifies race + job (e.g. "nu mou black mage" or "viera fencer")
+    for j_id, (j_name, j_race) in JOB_NAMES.items():
+        combined = f"{j_race} {j_name}".lower()
+        if clean == combined or norm_key == combined.replace(" ", "_"):
+            race_id = next(r_id for r_id, r_name in RACE_NAMES.items() if r_name.lower() == j_race.lower())
+            return j_id, race_id, [0, 0, 0, 0, 0], f"{j_race} {j_name}"
+
+    # Match by job name alone
+    for j_id, (j_name, j_race) in JOB_NAMES.items():
+        if clean == j_name.lower() or norm_key == j_name.lower().replace(" ", "_"):
+            race_id = next(r_id for r_id, r_name in RACE_NAMES.items() if r_name.lower() == j_race.lower())
+            return j_id, race_id, [0, 0, 0, 0, 0], f"{j_race} {j_name}"
+
+    raise ValueError(f"Unknown build or job type: '{query}'. Check builds.toml or specify a canonical job name.")
+
+
+def inject_unit(
+    sav_data: bytearray,
+    build_or_job: str,
+    target_slot: int = 1,
+    target_unit: int | None = None,
+    level: int = 8,
+    name: str | None = None,
+    builds_path: str | None = None,
+) -> tuple[bytearray, dict]:
+    """Injects a god-rolled, max-ability recruit into the clan."""
+    slots = get_slots(sav_data)
+    if target_slot not in slots:
+        raise ValueError(f"Slot {target_slot + 1} not found in save file!")
+
+    info = slots[target_slot]
+    secs = info["sectors"]
+    hdr_sec = secs[0]
+    hdr_offset = hdr_sec * SECTOR_SIZE
+
+    # Resolve target unit slot (auto-detect first empty slot if not specified)
+    if target_unit is None:
+        for u in range(24):
+            u_addr = hdr_offset + 0x80 + u * 0x108
+            if u_addr + 0x108 <= len(sav_data) and sav_data[u_addr + 0x09] == 0:
+                target_unit = u
+                break
+        if target_unit is None:
+            raise ValueError("Clan is full! All 24 unit slots are occupied.")
+    elif not (0 <= target_unit < 24):
+        raise ValueError(f"Invalid unit index {target_unit}. Must be 0..23.")
+
+    # Collect existing names across clan to avoid duplicate recruit names
+    existing_name_ids = set()
+    for u in range(24):
+        u_addr = hdr_offset + 0x80 + u * 0x108
+        if u_addr + 0x108 <= len(sav_data) and sav_data[u_addr + 0x09] > 0 and u != target_unit:
+            nid = struct.unpack("<H", sav_data[u_addr : u_addr + 2])[0]
+            existing_name_ids.add(nid)
+
+    # Resolve job, race, gear, and build title
+    job_id, race_id, gear, build_title = resolve_job_and_race(build_or_job, builds_path=builds_path)
+    race_name = RACE_NAMES[race_id]
+    job_title = JOB_NAMES[job_id][0]
+
+    # Resolve unit name
+    if name is not None:
+        clean_name = str(name).strip()
+        if clean_name.isdigit():
+            name_id = int(clean_name)
+            unit_name = get_unit_name(name_id)
+        else:
+            resolved_id = get_name_id_by_str(clean_name)
+            if resolved_id is None:
+                raise ValueError(f"Name '{clean_name}' not found in FFTA ROM database.")
+            name_id = resolved_id
+            unit_name = RECRUIT_NAMES[name_id]
+    else:
+        name_id, unit_name = generate_random_name(race_id, excluded_ids=existing_name_ids)
+
+    # Compute 115% top-rolled god stats
+    stats = compute_god_stats(job_id, level=level)
+
+    # Build pristine 0x108 unit block
+    ub = bytearray(0x108)
+
+    # 0x00..0x04: Name ID
+    ub[0x00:0x02] = struct.pack("<H", name_id)
+    # 0x04: Special recruit flag (1 = standard clan member)
+    ub[0x04] = 1
+    # 0x05: Sprite / Job index
+    ub[0x05] = job_id
+    # 0x06: Race ID
+    ub[0x06] = race_id
+    # 0x07: Primary Job ID
+    ub[0x07] = job_id
+    # 0x08: Secondary Job ID
+    ub[0x08] = DEFAULT_SECONDARY_JOBS.get(race_id, job_id)
+    # 0x09: Level
+    ub[0x09] = level
+    # 0x0A:0x0C: EXP = 0
+    ub[0x0A:0x0C] = b"\x00\x00"
+    # 0x0C:0x16: Base job masteries
+    ub[0x0C:0x16] = bytes([1] * 10)
+
+    # 0x18:0x28: Cur HP, Max HP, Cur MP, Max MP, WAtk, WDef, MPow, MRes
+    ub[0x18:0x28] = struct.pack(
+        "<8H",
+        stats["hp"],
+        stats["hp"],
+        stats["mp"],
+        stats["mp"],
+        stats["watk"],
+        stats["wdef"],
+        stats["mpow"],
+        stats["mres"],
+    )
+
+    # 0x2A:0x34: Equipment
+    full_gear = list(gear[:5]) + [0] * (5 - len(gear[:5]))
+    ub[0x2A:0x34] = struct.pack("<5H", *full_gear)
+
+    # 0x34: Race ability table base
+    ub[0x34] = RACE_ABILITY_BASE.get(race_id, 142)
+    # 0x35: Primary A-ability set
+    ub[0x35] = JOB_PRIMARY_A_SETS.get(job_id, 2)
+    # 0x36: Secondary A-ability set
+    ub[0x36] = DEFAULT_SECONDARY_A_SETS.get(race_id, 4)
+    # 0x3A: Reaction ability
+    ub[0x3A] = DEFAULT_REACTION_IDS.get(race_id, 0)
+    # 0x3B: Support ability
+    ub[0x3B] = DEFAULT_SUPPORT_IDS.get(race_id, 0)
+    # 0x3C: Combo ability
+    ub[0x3C] = DEFAULT_COMBO_IDS.get(race_id, 0)
+
+    # Master all abilities
+    count, blue_magic, morpher = RACE_ABILITY_SPECS.get(race_id, (80, 0, False))
+    for i in range(count):
+        ub[0x41 + i] = 0xE4
+    if blue_magic:
+        for i in range(blue_magic):
+            ub[0x9C + i] = 0xE4
+    if morpher:
+        for i in range(12):
+            ub[0x93 + i] = 0xE4
+
+    # 0xD2:0xD4: Base Speed
+    ub[0xD2:0xD4] = struct.pack("<H", stats["speed"])
+    # 0xD6: Growth fractional counter
+    ub[0xD6] = 5
+
+    # 0xF1:0x106: Job unlock bitmask counters
+    if race_id in RACE_JOB_COUNTERS:
+        ub[0xF1:0x106] = RACE_JOB_COUNTERS[race_id]
+
+    # 0x101: Jail battle counter
+    ub[0x101] = 0x00
+    # 0x102: Red cards
+    ub[0x102] = 0x00
+    # 0x103: Yellow cards
+    ub[0x103] = 0x00
+    # 0x104: Unit state (0xFF = Free / Active)
+    ub[0x104] = 0xFF
+
+    # Inject into save buffer
+    target_addr = hdr_offset + 0x80 + target_unit * 0x108
+    sav_data[target_addr : target_addr + 0x108] = ub
+
+    # Increment sequence counter
+    new_counter = info["counter"] + 1
+    sav_data[hdr_offset + 8 : hdr_offset + 12] = struct.pack("<I", new_counter)
+
+    # Recompute CRC32
+    new_crc = compute_crc(sav_data, secs)
+    sav_data[hdr_offset + 0x0C : hdr_offset + 0x10] = struct.pack("<I", new_crc)
+
+    inject_summary = {
+        "unit_idx": target_unit,
+        "name": unit_name,
+        "name_id": name_id,
+        "race": race_name,
+        "job": job_title,
+        "build": build_title,
+        "level": level,
+        "stats": stats,
+        "counter": new_counter,
+        "crc": new_crc,
+    }
+
+    print(f'  [+] Injected Unit {target_unit}: "{unit_name}" ({race_name} {job_title}, Lv {level})')
+    print(f"      Build: {build_title}")
+    print(
+        f"      Stats (115% God Roll): HP {stats['hp']}, MP {stats['mp']}, Spd {stats['speed']}, "
+        f"Atk {stats['watk']}, Def {stats['wdef']}, Pow {stats['mpow']}, Res {stats['mres']}"
+    )
+    print(f"      Abilities: Mastered all {count} skills + advanced jobs unlocked.")
+    print(f"      Sequence counter incremented to: {new_counter}")
+    print(f"      Checksum updated: {hex(new_crc)}")
+
+    return sav_data, inject_summary
+
+
+def rename_unit(
+    sav_data: bytearray,
+    target_unit: int,
+    new_name: str | None = None,
+    target_slot: int = 1,
+) -> tuple[bytearray, str]:
+    """Renames an existing unit using a specified name or generating a random ROM name."""
+    slots = get_slots(sav_data)
+    if target_slot not in slots:
+        raise ValueError(f"Slot {target_slot + 1} not found in save file!")
+
+    info = slots[target_slot]
+    secs = info["sectors"]
+    hdr_sec = secs[0]
+    hdr_offset = hdr_sec * SECTOR_SIZE
+
+    if not (0 <= target_unit < 24):
+        raise ValueError(f"Invalid unit index {target_unit}.")
+
+    u_addr = hdr_offset + 0x80 + target_unit * 0x108
+    if sav_data[u_addr + 0x09] == 0:
+        raise ValueError(f"Unit {target_unit} is empty (Level 0).")
+
+    race_id = sav_data[u_addr + 0x06]
+
+    # Collect existing names across clan
+    existing_name_ids = set()
+    for u in range(24):
+        ua = hdr_offset + 0x80 + u * 0x108
+        if ua + 0x108 <= len(sav_data) and sav_data[ua + 0x09] > 0 and u != target_unit:
+            nid = struct.unpack("<H", sav_data[ua : ua + 2])[0]
+            existing_name_ids.add(nid)
+
+    if new_name is not None:
+        clean = str(new_name).strip()
+        if clean.isdigit():
+            name_id = int(clean)
+            final_name = get_unit_name(name_id)
+        else:
+            resolved_id = get_name_id_by_str(clean)
+            if resolved_id is None:
+                raise ValueError(f"Name '{clean}' not found in FFTA ROM database.")
+            name_id = resolved_id
+            final_name = RECRUIT_NAMES[name_id]
+    else:
+        name_id, final_name = generate_random_name(race_id, excluded_ids=existing_name_ids)
+
+    sav_data[u_addr : u_addr + 2] = struct.pack("<H", name_id)
+
+    new_counter = info["counter"] + 1
+    sav_data[hdr_offset + 8 : hdr_offset + 12] = struct.pack("<I", new_counter)
+
+    new_crc = compute_crc(sav_data, secs)
+    sav_data[hdr_offset + 0x0C : hdr_offset + 0x10] = struct.pack("<I", new_crc)
+
+    print(f'  [+] Renamed Unit {target_unit} to: "{final_name}" (Name ID: {name_id})')
+    print(f"  [+] Sequence counter incremented to: {new_counter}")
+    print(f"  [+] Checksum updated: {hex(new_crc)}")
+    return sav_data, final_name
 
 
 def clear_clan_cards(sav_data, target_slot=1, re_equip=True):
@@ -850,6 +1179,24 @@ Examples:
         help="Specific build key from builds.toml to equip (e.g. gladiator, paladin, assassin)",
     )
     parser.add_argument(
+        "--inject",
+        help="Inject a god-rolled recruit from builds.toml or job name (e.g. morpher, dragoon, assassin, paladin)",
+    )
+    parser.add_argument(
+        "--level",
+        type=int,
+        default=8,
+        help="Recruit level for injected unit (default: 8)",
+    )
+    parser.add_argument(
+        "--name",
+        help="Custom recruit name (from FFTA ROM database) for injected unit",
+    )
+    parser.add_argument(
+        "--rename",
+        help="Rename an existing unit (specify --unit N, and custom name or 'auto' for random ROM name)",
+    )
+    parser.add_argument(
         "-f",
         "--force",
         action="store_true",
@@ -895,7 +1242,14 @@ Examples:
 
     # Default action: Inspect
     is_modifying = (
-        args.patch_units or args.super_starter or args.clear_cards or args.fix_crc or args.re_equip or args.build
+        args.patch_units
+        or args.super_starter
+        or args.clear_cards
+        or args.fix_crc
+        or args.re_equip
+        or args.build
+        or args.inject
+        or args.rename
     )
     if not is_modifying or args.inspect:
         inspect_save(data, show_roster=True)
@@ -907,6 +1261,10 @@ Examples:
         action_name = (
             "super_starter"
             if args.super_starter
+            else "inject_unit"
+            if args.inject
+            else "rename_unit"
+            if args.rename
             else "patch_units"
             if args.patch_units
             else "clear_cards"
@@ -919,7 +1277,28 @@ Examples:
         print(f"[*] Created pre-patch snapshot backup: {b_path}")
 
     # Modifications
-    if args.patch_units:
+    if args.inject:
+        data, _ = inject_unit(
+            data,
+            build_or_job=args.inject,
+            target_slot=target_slot,
+            target_unit=args.unit,
+            level=args.level,
+            name=args.name,
+        )
+
+    if args.rename and not args.inject:
+        if args.unit is None:
+            print("Error: --rename requires --unit <index> (0..23)", file=sys.stderr)
+            sys.exit(1)
+        data, _ = rename_unit(
+            data,
+            target_unit=args.unit,
+            new_name=args.rename if args.rename.lower() != "auto" else None,
+            target_slot=target_slot,
+        )
+
+    if args.patch_units and not args.inject:
         data = patch_clan_units(data, target_slot=target_slot, target_unit=args.unit)
 
     if args.super_starter:
@@ -931,10 +1310,10 @@ Examples:
             force=args.force,
         )
 
-    if args.clear_cards and not args.patch_units and not args.super_starter:
+    if args.clear_cards and not args.patch_units and not args.super_starter and not args.inject:
         data = clear_clan_cards(data, target_slot=target_slot)
 
-    if (args.re_equip or args.build) and not args.patch_units and not args.super_starter:
+    if (args.re_equip or args.build) and not args.patch_units and not args.super_starter and not args.inject:
         data = equip_unit_build(
             data,
             target_slot=target_slot,
@@ -942,7 +1321,15 @@ Examples:
             build_key=args.build,
         )
 
-    if args.fix_crc and not args.patch_units and not args.super_starter and not args.clear_cards and not args.re_equip:
+    if (
+        args.fix_crc
+        and not args.patch_units
+        and not args.super_starter
+        and not args.clear_cards
+        and not args.re_equip
+        and not args.inject
+        and not args.rename
+    ):
         data = fix_crc(data, target_slot=target_slot)
 
     # Atomic write
