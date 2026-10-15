@@ -16,7 +16,7 @@ FFTA uses a sector-based wear-leveling system across Flash memory to extend hard
 ### Header Sector Layout (Sector 0)
 
 | Offset | Size | Type | Description |
-|---|---|---|---|
+| --- | --- | --- | --- |
 | `0x00..0x08` | 8 B | ASCII | Magic identifier (`"44444444"`) |
 | `0x08..0x0C` | 4 B | uint32 | Wear-leveling sequence counter (little-endian) |
 | `0x0C..0x10` | 4 B | uint32 | Sector-chain CRC32 checksum |
@@ -32,7 +32,7 @@ FFTA uses a sector-based wear-leveling system across Flash memory to extend hard
 Every clan member occupies exactly 264 (`0x108`) bytes in the active sector chain:
 
 | Offset | Size | Type | Description |
-|---|---|---|---|
+| --- | --- | --- | --- |
 | `0x00..0x02` | 2 B | uint16 | Recruit Name ID (maps into ROM string table, 0..724) |
 | `0x04` | 1 B | uint8 | Special Character Flag (1 = Standard recruit, 2 = Marche, 8 = Montblanc) |
 | `0x05` | 1 B | uint8 | Sprite / Job Animation index (Job ID 2 = Soldier; avoid `0x01` prologue sprite bug) |
@@ -40,10 +40,10 @@ Every clan member occupies exactly 264 (`0x108`) bytes in the active sector chai
 | `0x07` | 1 B | uint8 | Primary Job ID |
 | `0x08` | 1 B | uint8 | Secondary Job ID |
 | `0x09` | 1 B | uint8 | Unit Level (1..50; 0 indicates an empty unit slot) |
-| `0x18..0x20` | 4 × uint16 | Cur HP, Max HP, Cur MP, Max MP |
-| `0x20..0x28` | 4 × uint16 | Weapon Attack, Weapon Defense, Magic Power, Magic Resistance |
+| `0x18..0x20` | 8 B | 4 × uint16 | Cur HP, Max HP, Cur MP, Max MP |
+| `0x20..0x28` | 8 B | 4 × uint16 | Weapon Attack, Weapon Defense, Magic Power, Magic Resistance |
 | `0x28` | 1 B | uint8 | Status Flags (Bit 3: `0x08` = In Jail) |
-| `0x2A..0x34` | 5 × uint16 | Equipped Item IDs (Right Hand, Left Hand, Head, Body, Accessory) |
+| `0x2A..0x34` | 10 B | 5 × uint16 | Equipped Item IDs (Right Hand, Left Hand, Head, Body, Accessory) |
 | `0x34` | 1 B | uint8 | Race ability table base index |
 | `0x35` | 1 B | uint8 | Primary A-Ability Set ID |
 | `0x36` | 1 B | uint8 | Secondary A-Ability Set ID (must differ from Primary) |
@@ -64,5 +64,6 @@ Every clan member occupies exactly 264 (`0x108`) bytes in the active sector chai
 ## 3. Checksum Algorithm (CRC32)
 
 Save validity is guarded by a standard CRC32 computed across the physical sector chain specified in `hdr[0x12:0x16]`:
+
 - Before hashing, the 4 checksum bytes at `0x0C..0x10` are treated as zero.
 - If the computed CRC does not match `hdr[0x0C:0x10]`, the game rejects the save sector as corrupt and attempts fallback to older sectors.

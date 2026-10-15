@@ -7,7 +7,7 @@ High-value automation and inspection scripts for *Final Fantasy Tactics Advance*
 ## 🛠️ Tools Overview
 
 | Script | Purpose | Key Flags |
-|---|---|---|
+| --- | --- | --- |
 | [`validate_saves.py`](validate_saves.py) | Full health check across local and Pocket `.sav` files (CRCs, counters, units, equipment, duplicate skills, sprite glitches). | `--pocket`, `--all`, `[path]` |
 | [`topup_clan_units.py`](topup_clan_units.py) | Non-destructive clan unit top-up (preserves high speed, buffs sub-optimal stats to 115% god roll, equips meta gear). | `--slot`, `--units`, `--sync` |
 | [`generate_race_save.py`](generate_race_save.py) | Generates canonical race-specific `.sav` and `.gba` (Hume, Bangaa, Moogle, Viera, Nu Mou) with Lv 8 god stats and meta gear. | `<race>`, `--level`, `--sync` |
@@ -20,6 +20,7 @@ High-value automation and inspection scripts for *Final Fantasy Tactics Advance*
 ## 🚀 Quick Usage Examples
 
 ### 1. Save Health Check & Diagnostics
+
 ```bash
 # Validate all local and Pocket saves
 uv run python support/validate_saves.py
@@ -32,6 +33,7 @@ uv run python support/validate_saves.py "/home/izaac/Documents/FFTA_Assets/Final
 ```
 
 ### 2. Generate Race Save Fleets
+
 ```bash
 # Generate single race fleet (e.g. Nu Mou) and sync directly to Analogue Pocket
 uv run python support/generate_race_save.py nu_mou --sync
@@ -41,6 +43,7 @@ uv run python support/generate_race_save.py all --sync
 ```
 
 ### 3. Sync to Analogue Pocket SD Card
+
 ```bash
 # Preview what would be copied
 uv run python support/sync_pocket.py --dry-run
@@ -50,6 +53,7 @@ uv run python support/sync_pocket.py
 ```
 
 ### 4. ROM & Database Inspection
+
 ```bash
 # View base stats and growth rates for a job
 uv run python support/inspect_rom.py --job "Sage"
@@ -65,6 +69,7 @@ uv run python support/inspect_rom.py --races
 ```
 
 ### 5. Repair Save Checksums
+
 ```bash
 # Repair CRC32 checksums on an altered save
 uv run python support/fix_save_crc.py path/to/corrupted.sav
