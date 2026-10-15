@@ -2,6 +2,7 @@ __pycache__/
 *.pyc
 *.tmp
 *.sav
+*.gba
 !examples/*.sav
 .venv/
 build/
