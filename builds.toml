@@ -21,9 +21,9 @@ gear_names = ["Tulwar", "Tulwar", "Acacia Hat", "Ninja Gear", "Fairy Shoes"]
 name = "Hume Dual-Wield Paladin"
 race = "Hume"
 job = "Paladin"
-description = "Dual Arch Sword holy warrior with Maximillian plate defense"
-gear = [0x002E, 0x002E, 0x012B, 0x0167, 0x015C]
-gear_names = ["Arch Sword", "Arch Sword", "Maximillian", "Ruby Earring", "Ninja Tabi"]
+description = "Dual Arch Sword holy warrior with Maximillian plate defense and Mindu Gem"
+gear = [0x002E, 0x002E, 0x012B, 0x0169, 0x015C]
+gear_names = ["Arch Sword", "Arch Sword", "Maximillian", "Mindu Gem", "Ninja Tabi"]
 
 [builds.gunner]
 name = "Moogle Long-Range Gunner"
@@ -45,9 +45,9 @@ gear_names = ["Sage Crosier", "Magic Robe", "Acacia Hat", "Ninja Tabi", "Angel R
 name = "Viera Speed Assassin"
 race = "Viera"
 job = "Assassin"
-description = "High speed Masamune 100 with Ribbon and Angel Ring"
-gear = [0x0076, 0x0138, 0x0114, 0x015C, 0x0165]
-gear_names = ["Masamune 100", "Ninja Gear", "Ribbon", "Ninja Tabi", "Angel Ring"]
+description = "High speed Masamune 100 with Ribbon and Genji Armlets"
+gear = [0x0076, 0x0138, 0x0114, 0x015C, 0x0160]
+gear_names = ["Masamune 100", "Ninja Gear", "Ribbon", "Ninja Tabi", "Genji Armlets"]
 
 [builds.juggler]
 name = "Moogle Juggler"
