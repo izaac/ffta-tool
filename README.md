@@ -15,30 +15,43 @@ Zero external dependencies required. Built with Python 3.10+ standard library.
 
 ---
 
-## Quick Start (with `uv`)
+## Installation & Quick Start
 
-Run directly without installation:
+### With `just` (Cross-Platform)
 
 ```bash
-uv run ffta-tool
+just install   # Install editable CLI via uv or pip
+just test      # Run full 50-test diagnostic suite
+just sync      # Sync ROMs and saves to Analogue Pocket
 ```
 
-Install as an isolated CLI command:
+### With `uv`
 
 ```bash
+# Run directly without global installation
+uv run ffta-tool
+
+# Or install as an isolated CLI tool
 uv tool install .
 ffta-tool
 ```
 
----
-
-## Standalone (No `uv`)
-
-Works on Linux, macOS, and Windows with Python 3.10+:
+### With Standard `pip` (Linux, macOS, Windows)
 
 ```bash
+python3 -m pip install -e .
+ffta-tool
+```
+
+### Standalone (No Installation Required)
+
+```bash
+# Linux / macOS
 chmod +x ffta_tool.py
 ./ffta_tool.py
+
+# Windows
+python ffta_tool.py
 ```
 
 ---

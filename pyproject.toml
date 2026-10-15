@@ -25,6 +25,10 @@ ffta-tool = "ffta_tool:main"
 
 [tool.setuptools]
 py-modules = ["ffta_tool", "mappings"]
+packages = ["core", "support"]
+
+[tool.setuptools.package-data]
+"*" = ["*.toml"]
 
 [tool.ruff]
 line-length = 120

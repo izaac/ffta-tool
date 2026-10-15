@@ -11,9 +11,11 @@ import os
 import shutil
 import sys
 
+from pathlib import Path
+
 DEFAULT_ASSET_DIR = os.environ.get(
     "FFTA_ASSET_DIR",
-    os.path.expanduser("~/Documents/FFTA_Assets"),
+    str(Path.home() / "Documents" / "FFTA_Assets"),
 )
 
 
@@ -21,6 +23,15 @@ def find_pocket_base() -> str:
     """Dynamically locates the Analogue Pocket SD card mount point."""
     if "POCKET_DIR" in os.environ and os.path.exists(os.environ["POCKET_DIR"]):
         return os.environ["POCKET_DIR"]
+
+    # Windows drive detection (e.g. D:\, E:\, F:\)
+    if os.name == "nt":
+        import string
+        for letter in string.ascii_uppercase[2:]:
+            drive = f"{letter}:\\"
+            if os.path.exists(drive):
+                if os.path.exists(os.path.join(drive, "Saves")) or os.path.exists(os.path.join(drive, "Assets")):
+                    return drive
 
     for mount_root in ["/run/media", "/media", "/mnt", "/Volumes"]:
         if os.path.exists(mount_root):
@@ -124,7 +135,11 @@ def sync_pocket(asset_dir: str = DEFAULT_ASSET_DIR, pocket_base: str = DEFAULT_P
 
     if not dry_run and copied_count > 0:
         print("\n[*] Flushing OS filesystem buffers (sync)...")
-        os.sync()
+        if hasattr(os, "sync"):
+            try:
+                os.sync()
+            except OSError:
+                pass
         print("[+] Filesystem buffers flushed successfully.")
 
     print(f"\n{'=' * 78}")

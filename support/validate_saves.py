@@ -29,6 +29,10 @@ def validate_save_file(path: str, verbose: bool = True) -> bool:
     with open(path, "rb") as f:
         data = f.read()
 
+    if len(data) < 0x10000:
+        print(f"[-] Invalid file size: {len(data)} bytes (expected at least 65536 bytes for GBA Flash)")
+        return False
+
     slots = get_slots(data)
     fname = os.path.basename(path)
     print(f"\n{'=' * 78}")

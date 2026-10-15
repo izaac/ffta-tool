@@ -136,10 +136,11 @@ def get_default_backup_dir(custom_dir=None) -> Path:
     """Returns the backup directory path, expanding tilde if needed."""
     if custom_dir:
         return Path(os.path.expanduser(str(custom_dir)))
-    home = os.environ.get("HOME")
-    if home:
-        return Path(home) / "Documents" / "FFTA_Backups"
-    return Path.cwd() / "backups"
+    try:
+        home_path = Path.home()
+        return home_path / "Documents" / "FFTA_Backups"
+    except Exception:
+        return Path.cwd() / "backups"
 
 
 def load_builds(builds_path=None) -> dict:
@@ -159,6 +160,10 @@ def load_builds(builds_path=None) -> dict:
                 user_b = Path.home() / ".config" / "ffta-tool" / "builds.toml"
             if user_b.is_file():
                 target = user_b
+            else:
+                pkg_b = Path(__file__).resolve().parent.parent / "builds.toml"
+                if pkg_b.is_file():
+                    target = pkg_b
 
     if not target or not target.is_file():
         return {}

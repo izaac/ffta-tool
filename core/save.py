@@ -68,24 +68,37 @@ def auto_detect_save(config=None):
             candidates.extend(glob.glob(expanded))
     else:
         # Check removable media mounts dynamically across system mount points
-        for mount_root in ["/run/media", "/media", "/mnt"]:
-            pattern = f"{mount_root}/*/*/Saves/GBA/*Final Fantasy Tactics Advance*.sav"
-            candidates.extend(glob.glob(pattern))
+        for mount_root in ["/run/media", "/media", "/mnt", "/Volumes"]:
+            candidates.extend(glob.glob(f"{mount_root}/*/*/Saves/GBA/*Final Fantasy Tactics Advance*.sav"))
+            candidates.extend(glob.glob(f"{mount_root}/*/*/Saves/gba/*Final Fantasy Tactics Advance*.sav"))
+            candidates.extend(glob.glob(f"{mount_root}/*/Saves/GBA/*Final Fantasy Tactics Advance*.sav"))
+            candidates.extend(glob.glob(f"{mount_root}/*/Saves/gba/*Final Fantasy Tactics Advance*.sav"))
 
-        home = os.environ.get("HOME")
-        if home:
-            home_path = Path(home)
+        if os.name == "nt":
+            import string
+            for letter in string.ascii_uppercase[2:]:
+                candidates.extend(glob.glob(f"{letter}:\\Saves\\gba\\*Final Fantasy Tactics Advance*.sav"))
+                candidates.extend(glob.glob(f"{letter}:\\Saves\\GBA\\*Final Fantasy Tactics Advance*.sav"))
+
+        try:
+            home_path = Path.home()
             doc_dir = home_path / "Documents"
             backup_dir = doc_dir / "FFTA_Backups"
+            asset_dir = doc_dir / "FFTA_Assets"
             candidates.extend(
                 [
+                    str(asset_dir / "Final Fantasy Tactics Advance (U) [!].sav"),
                     str(doc_dir / "FFTA_Save_Slot2_Mastered_Recruits_Juggler.sav"),
                     str(backup_dir / "FFTA_Save_Slot2_Mastered_Recruits_Juggler.sav"),
                     str(backup_dir / "Final_Fantasy_Tactics_Advance_Current_Patched.sav"),
                 ]
             )
+            if asset_dir.is_dir():
+                candidates.extend(glob.glob(str(asset_dir / "*.sav")))
             if backup_dir.is_dir():
                 candidates.extend(glob.glob(str(backup_dir / "*.sav")))
+        except Exception:
+            pass
 
         # Fallback to current directory .sav files
         candidates.extend(glob.glob("*.sav"))
@@ -112,14 +125,22 @@ def create_snapshot_backup(filepath, action_name="update", backup_dir=None):
 
 def atomic_write(filepath, data):
     """Safely writes data to a temporary file then replaces target atomically."""
-    tmp_path = filepath + ".tmp"
-    with open(tmp_path, "wb") as f:
-        f.write(data)
-        f.flush()
-        os.fsync(f.fileno())
-    os.replace(tmp_path, filepath)
-    with contextlib.suppress(AttributeError):
-        os.sync()
+    dir_name = os.path.dirname(os.path.abspath(filepath))
+    os.makedirs(dir_name, exist_ok=True)
+    tmp_path = filepath + f".tmp_{os.getpid()}"
+    try:
+        with open(tmp_path, "wb") as f:
+            f.write(data)
+            f.flush()
+            os.fsync(f.fileno())
+        os.replace(tmp_path, filepath)
+        if hasattr(os, "sync"):
+            with contextlib.suppress(AttributeError, OSError):
+                os.sync()
+    finally:
+        if os.path.exists(tmp_path):
+            with contextlib.suppress(OSError):
+                os.remove(tmp_path)
 
 
 def fix_crc(sav_data, target_slot=1):

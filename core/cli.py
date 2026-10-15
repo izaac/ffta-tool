@@ -244,6 +244,10 @@ Examples:
     with open(target_path, "rb") as f:
         data = bytearray(f.read())
 
+    if len(data) < 0x10000:
+        print(f"Error: Invalid save file size ({len(data)} bytes). Expected at least 65536 bytes for GBA Flash.", file=sys.stderr)
+        sys.exit(1)
+
     target_slot = args.slot - 1
 
     monster_bank_action = (

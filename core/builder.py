@@ -62,6 +62,9 @@ def equip_unit_build(
     if target_slot not in slots:
         raise ValueError(f"Slot {target_slot + 1} not found!")
 
+    if target_unit is not None and not (0 <= target_unit < 24):
+        raise ValueError(f"target_unit must be between 0 and 23 (got {target_unit}).")
+
     builds = load_builds(builds_path)
     if not builds:
         print("  [!] Notice: No builds database found. Skipping build equip.")
@@ -214,6 +217,9 @@ def inject_unit(
             raise ValueError("Clan is full! All 24 unit slots are occupied.")
     elif not (0 <= target_unit < 24):
         raise ValueError(f"Invalid unit index {target_unit}. Must be 0..23.")
+
+    if level is not None and not (1 <= level <= 99):
+        raise ValueError(f"Recruit level must be between 1 and 99 (got {level}).")
 
     # Collect existing names across clan to avoid duplicate recruit names
     existing_name_ids = set()

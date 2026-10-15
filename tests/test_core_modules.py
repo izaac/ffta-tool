@@ -105,6 +105,57 @@ class TestCoreModules(unittest.TestCase):
                     core.cli.main()
                 self.assertEqual(cm.exception.code, 2)
 
+    def test_boundary_guards_core_apis(self):
+        """Ensure core APIs raise ValueError on out-of-bounds arguments."""
+        sav = bytearray(0x10000)
+        # Create a mock valid slot 2
+        hdr_sec = 4
+        sav[hdr_sec * 0x1000 : hdr_sec * 0x1000 + 8] = b"FFTEX000"
+        sav[hdr_sec * 0x1000 + 0x10] = 1  # Slot 2
+        sav[hdr_sec * 0x1000 + 0x12 : hdr_sec * 0x1000 + 0x16] = bytes([4, 5, 6, 7])
+
+        with self.assertRaises(ValueError):
+            core.builder.equip_unit_build(sav, target_unit=-1)
+        with self.assertRaises(ValueError):
+            core.builder.equip_unit_build(sav, target_unit=24)
+        with self.assertRaises(ValueError):
+            core.patcher.patch_clan_units(sav, target_unit=-1)
+        with self.assertRaises(ValueError):
+            core.patcher.patch_clan_units(sav, target_unit=24)
+        with self.assertRaises(ValueError):
+            core.builder.rename_unit(sav, target_unit=-1)
+        with self.assertRaises(ValueError):
+            core.builder.rename_unit(sav, target_unit=24)
+        with self.assertRaises(ValueError):
+            core.builder.inject_unit(sav, "morpher", target_unit=-1)
+        with self.assertRaises(ValueError):
+            core.builder.inject_unit(sav, "morpher", target_unit=24)
+        with self.assertRaises(ValueError):
+            core.builder.inject_unit(sav, "morpher", level=0)
+        with self.assertRaises(ValueError):
+            core.builder.inject_unit(sav, "morpher", level=100)
+
+    def test_atomic_write_and_builds_fallback(self):
+        """Ensure atomic_write safely creates parent directories and load_builds resolves repo builds."""
+        import tempfile
+        import shutil
+
+        # Test atomic_write directory creation
+        td = tempfile.mkdtemp()
+        try:
+            nested_file = os.path.join(td, "sub", "dir", "test.sav")
+            core.save.atomic_write(nested_file, b"test_data")
+            self.assertTrue(os.path.isfile(nested_file))
+            with open(nested_file, "rb") as f:
+                self.assertEqual(f.read(), b"test_data")
+        finally:
+            shutil.rmtree(td, ignore_errors=True)
+
+        # Test load_builds package fallback
+        builds = core.config.load_builds()
+        self.assertIn("morpher", builds)
+        self.assertIn("paladin", builds)
+
 
 if __name__ == "__main__":
     unittest.main()

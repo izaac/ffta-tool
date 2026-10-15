@@ -29,6 +29,9 @@ def patch_clan_units(sav_data: bytearray, target_slot: int = 1, target_unit: int
     if target_slot not in slots:
         raise ValueError(f"Slot {target_slot + 1} not found!")
 
+    if target_unit is not None and not (0 <= target_unit < 24):
+        raise ValueError(f"target_unit must be between 0 and 23 (got {target_unit}).")
+
     info = slots[target_slot]
     secs = info["sectors"]
     hdr_sec = secs[0]
@@ -187,21 +190,24 @@ def patch_super_starter(
         if iid != 0:
             orig_flags[iid] = sav_data[addr + 3]
 
+    e_qty = max(1, min(99, equip_qty))
+    i_qty = max(1, min(99, item_qty))
+
     for idx, eid in enumerate(EQUIPMENT_IDS):
         addr = sec1_offset + 0x940 + idx * 4
         sav_data[addr : addr + 2] = eid.to_bytes(2, "little")
-        sav_data[addr + 2] = equip_qty
+        sav_data[addr + 2] = e_qty
         sav_data[addr + 3] = orig_flags.get(eid, 0)
 
     for idx, cid in enumerate(CONSUMABLE_IDS):
         addr = sec1_offset + 0xEE4 + idx * 4
         sav_data[addr : addr + 2] = cid.to_bytes(2, "little")
-        sav_data[addr + 2] = item_qty
+        sav_data[addr + 2] = i_qty
         sav_data[addr + 3] = 0
 
     print(
-        f"  [+] Injected {len(EQUIPMENT_IDS)} weapons/gear ({equip_qty}x) "
-        f"and {len(CONSUMABLE_IDS)} consumables ({item_qty}x)."
+        f"  [+] Injected {len(EQUIPMENT_IDS)} weapons/gear ({e_qty}x) "
+        f"and {len(CONSUMABLE_IDS)} consumables ({i_qty}x)."
     )
 
     # 5. Populate Monster Bank with all 20 monsters
