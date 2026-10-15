@@ -73,6 +73,14 @@ description = "Martial artist with Bangaa Spike, Maximillian, and Mindu Gem"
 gear = [0x00C8, 0x012B, 0x0111, 0x015C, 0x0169]
 gear_names = ["Bangaa Spike", "Maximillian", "Bangaa Helm", "Ninja Tabi", "Mindu Gem"]
 
+[builds.dragoon]
+name = "Bangaa Dragoon"
+race = "Bangaa"
+job = "Dragoon"
+description = "High physical spear piercer with Bangaa Spike, Maximillian, and Mindu Gem"
+gear = [0x00C8, 0x012B, 0x0111, 0x015C, 0x0169]
+gear_names = ["Bangaa Spike", "Maximillian", "Bangaa Helm", "Ninja Tabi", "Mindu Gem"]
+
 [builds.morpher]
 name = "Nu Mou Morpher"
 race = "Nu Mou"
