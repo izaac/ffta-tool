@@ -6,9 +6,9 @@ name = "Bangaa Gladiator"
 race = "Bangaa"
 job = "Gladiator"
 job_id = 16
-description = "Ultima Sword striker with Materia Blade, Thief Hat, Ninja Gear, Ninja Tabi, and Genji Armlets"
-gear = [0x001A, 0x011B, 0x0138, 0x015C, 0x0160]
-gear_names = ["Materia Blade", "Thief Hat", "Ninja Gear", "Ninja Tabi", "Genji Armlets"]
+description = "Ultima Sword striker with Ebon Blade, Thief Hat, Ninja Gear, Ninja Tabi, and Genji Armlets"
+gear = [0x001C, 0x011B, 0x0138, 0x015C, 0x0160]
+gear_names = ["Ebon Blade", "Thief Hat", "Ninja Gear", "Ninja Tabi", "Genji Armlets"]
 
 [builds.blue_mage]
 name = "Hume Dual-Wield Blue Mage"
@@ -147,9 +147,9 @@ name = "Hume Soldier"
 race = "Hume"
 job = "Soldier"
 job_id = 2
-description = "Heavy frontline warrior with Materia Blade, Genji Shield, Genji Helm, and Maximillian"
-gear = [0x001A, 0x0103, 0x010E, 0x012B, 0x015C]
-gear_names = ["Materia Blade", "Genji Shield", "Genji Helm", "Maximillian", "Ninja Tabi"]
+description = "Heavy frontline warrior with Chirijiraden, Genji Shield, Genji Helm, and Maximillian"
+gear = [0x000C, 0x0103, 0x010E, 0x012B, 0x015C]
+gear_names = ["Chirijiraden", "Genji Shield", "Genji Helm", "Maximillian", "Ninja Tabi"]
 
 [builds.fighter]
 name = "Hume Fighter"
@@ -233,9 +233,9 @@ name = "Moogle Mog Knight"
 race = "Moogle"
 job = "Mog Knight"
 job_id = 37
-description = "Heavy plate holy warrior with Materia Blade, Genji Shield, Genji Helm, and Maximillian"
-gear = [0x001A, 0x0103, 0x010E, 0x012B, 0x015C]
-gear_names = ["Materia Blade", "Genji Shield", "Genji Helm", "Maximillian", "Ninja Tabi"]
+description = "Heavy plate holy warrior with Ebon Blade, Genji Shield, Genji Helm, and Maximillian"
+gear = [0x001C, 0x0103, 0x010E, 0x012B, 0x015C]
+gear_names = ["Ebon Blade", "Genji Shield", "Genji Helm", "Maximillian", "Ninja Tabi"]
 
 [builds.thief_moogle]
 name = "Moogle Thief"
