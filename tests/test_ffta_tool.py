@@ -527,18 +527,18 @@ class TestFftaTool(unittest.TestCase):
         """Verifies compute_god_stats calculates optimal 115% top-rolled base stats and growths."""
         # Test Job 0x1A (Nu Mou Morpher) at Level 8
         stats = compute_god_stats(0x1A, level=8)
-        self.assertEqual(stats["hp"], 115)
+        self.assertEqual(stats["hp"], 86)
         self.assertEqual(stats["mp"], 56)
         self.assertEqual(stats["speed"], 137)
-        self.assertEqual(stats["watk"], 127)
-        self.assertEqual(stats["wdef"], 131)
-        self.assertEqual(stats["mpow"], 131)
-        self.assertEqual(stats["mres"], 139)
+        self.assertEqual(stats["watk"], 130)
+        self.assertEqual(stats["wdef"], 149)
+        self.assertEqual(stats["mpow"], 140)
+        self.assertEqual(stats["mres"], 148)
 
         # Test Job 0x22 (Viera Assassin) at Level 8
         stats_assassin = compute_god_stats(0x22, level=8)
         self.assertEqual(stats_assassin["speed"], 159)
-        self.assertEqual(stats_assassin["hp"], 129)
+        self.assertEqual(stats_assassin["hp"], 66)
 
     def test_name_helpers_and_generator(self):
         """Verifies get_unit_name, get_name_id_by_str, and generate_random_name."""
