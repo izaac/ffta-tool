@@ -45,9 +45,9 @@ gear_names = ["Sage Crosier", "Magic Robe", "Acacia Hat", "Ninja Tabi", "Angel R
 name = "Viera Speed Assassin"
 race = "Viera"
 job = "Assassin"
-description = "High speed Masamune 100 with Ribbon and Genji Armlets"
-gear = [0x0076, 0x0138, 0x0114, 0x015C, 0x0160]
-gear_names = ["Masamune 100", "Ninja Gear", "Ribbon", "Ninja Tabi", "Genji Armlets"]
+description = "High speed Masamune 100 with Ribbon and Ninja Tabi"
+gear = [0x0076, 0x0000, 0x0114, 0x0138, 0x015C]
+gear_names = ["Masamune 100", "-", "Ribbon", "Ninja Gear", "Ninja Tabi"]
 
 [builds.juggler]
 name = "Moogle Juggler"
@@ -61,9 +61,57 @@ gear_names = ["Cinquedea", "Ninja Gear", "Acacia Hat", "Ninja Tabi", "Angel Ring
 name = "Viera Red Mage"
 race = "Viera"
 job = "Red Mage"
-description = "Doublecast rapier specialist with Ribbon and Genji Armlets"
-gear = [0x0069, 0x0114, 0x0138, 0x015C, 0x0160]
-gear_names = ["Aerial Hole", "Ribbon", "Ninja Gear", "Ninja Tabi", "Genji Armlets"]
+description = "Doublecast rapier specialist with Aerial Hole and Ribbon"
+gear = [0x0069, 0x0000, 0x0114, 0x0138, 0x015C]
+gear_names = ["Aerial Hole", "-", "Ribbon", "Ninja Gear", "Ninja Tabi"]
+
+[builds.fencer]
+name = "Viera Fencer"
+race = "Viera"
+job = "Fencer"
+description = "Rapier specialist with Flamberge, Ribbon, and Ninja Tabi"
+gear = [0x005C, 0x0000, 0x0114, 0x0138, 0x015C]
+gear_names = ["Flamberge", "-", "Ribbon", "Ninja Gear", "Ninja Tabi"]
+
+[builds.elementalist]
+name = "Viera Elementalist"
+race = "Viera"
+job = "Elementalist"
+description = "Elemental magic rapier disabler with Epeprism, Magic Robe, and Ribbon"
+gear = [0x0064, 0x0000, 0x0114, 0x0151, 0x015C]
+gear_names = ["Epeprism", "-", "Ribbon", "Magic Robe", "Ninja Tabi"]
+
+[builds.white_mage]
+name = "Viera White Mage"
+race = "Viera"
+job = "White Mage"
+description = "Staff healer with Spring Staff, White Robe, and Ribbon"
+gear = [0x0080, 0x0000, 0x0114, 0x014A, 0x015C]
+gear_names = ["Spring Staff", "-", "Ribbon", "White Robe", "Ninja Tabi"]
+
+[builds.summoner]
+name = "Viera Summoner"
+race = "Viera"
+job = "Summoner"
+description = "High magic summoner with Nirvana Staff, Magic Robe, and Ribbon"
+gear = [0x0083, 0x0000, 0x0114, 0x0151, 0x015C]
+gear_names = ["Nirvana Staff", "-", "Ribbon", "Magic Robe", "Ninja Tabi"]
+
+[builds.archer]
+name = "Viera Archer"
+race = "Viera"
+job = "Archer"
+description = "Long range bow archer with Perseus Bow, Ninja Gear, and Ribbon"
+gear = [0x00AA, 0x0000, 0x0114, 0x0138, 0x015C]
+gear_names = ["Perseus Bow", "-", "Ribbon", "Ninja Gear", "Ninja Tabi"]
+
+[builds.sniper]
+name = "Viera Sniper"
+race = "Viera"
+job = "Sniper"
+description = "Heavy greatbow sharpshooter with Max's Oathbow, Ninja Gear, and Ribbon"
+gear = [0x00B7, 0x0000, 0x0114, 0x0138, 0x015C]
+gear_names = ["Max's Oathbow", "-", "Ribbon", "Ninja Gear", "Ninja Tabi"]
 
 [builds.white_monk]
 name = "Bangaa White Monk"
