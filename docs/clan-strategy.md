@@ -21,6 +21,7 @@ In our system:
 | **Ayvuir Red** (62 Atk) | **Ebon Blade** (84 Atk, Dark) | +22 WAtk |
 | **Flamberge** (35 Atk) | **Femme Fatale** (49 Atk, +2 Spd) | +14 WAtk, +2 Speed, Null Doom |
 | **Spring Staff** (28 Atk) | **Dream Watcher** (43 Atk, +10 MPow, +15 MRes) | +15 WAtk, +10 MPow, +15 MRes |
+| **Princess Rod** (35 Atk, +2 MPow) | **Heretic Rod** (31 Atk, +20 MPow) | +18 MPow (max rod magic power) |
 | **Silver Sword** (20 Atk) | **Chirijiraden** (65 Atk) | +45 WAtk |
 | **Shortbow** (19 Atk) | **Perseus Bow** (42 Atk) | +23 WAtk |
 

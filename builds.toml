@@ -88,9 +88,9 @@ gear_names = ["Aerial Hole", "Ribbon", "Magic Robe", "Ninja Tabi", "Genji Armlet
 name = "Viera White Mage"
 race = "Viera"
 job = "White Mage"
-description = "Staff healer with Nirvana Staff, White Robe, Ribbon, and Angel Ring"
-gear = [0x0083, 0x0114, 0x014A, 0x015C, 0x0165]
-gear_names = ["Nirvana Staff", "Ribbon", "White Robe", "Ninja Tabi", "Angel Ring"]
+description = "Staff healer with Dream Watcher (+10 MagPow, +15 MagRes), White Robe, Ribbon, and Angel Ring"
+gear = [0x0086, 0x0114, 0x014A, 0x015C, 0x0165]
+gear_names = ["Dream Watcher", "Ribbon", "White Robe", "Ninja Tabi", "Angel Ring"]
 
 [builds.summoner]
 name = "Viera Summoner"
@@ -196,27 +196,27 @@ name = "Hume White Mage"
 race = "Hume"
 job = "White Mage"
 job_id = 7
-description = "Holy healer with Nirvana Staff, Acacia Hat, White Robe, and Angel Ring"
-gear = [0x0083, 0x011E, 0x014A, 0x015C, 0x0165]
-gear_names = ["Nirvana Staff", "Acacia Hat", "White Robe", "Ninja Tabi", "Angel Ring"]
+description = "Holy healer with Dream Watcher (+10 MagPow, +15 MagRes), Acacia Hat, White Robe, and Angel Ring"
+gear = [0x0086, 0x011E, 0x014A, 0x015C, 0x0165]
+gear_names = ["Dream Watcher", "Acacia Hat", "White Robe", "Ninja Tabi", "Angel Ring"]
 
 [builds.black_mage_hume]
 name = "Hume Black Mage"
 race = "Hume"
 job = "Black Mage"
 job_id = 8
-description = "Elemental magic caster with Princess Rod, Acacia Hat, Black Robe, and Angel Ring"
-gear = [0x0091, 0x011E, 0x014B, 0x015C, 0x0165]
-gear_names = ["Princess Rod", "Acacia Hat", "Black Robe", "Ninja Tabi", "Angel Ring"]
+description = "Elemental magic caster with Heretic Rod (+20 MagPow), Acacia Hat, Black Robe, and Angel Ring"
+gear = [0x0093, 0x011E, 0x014B, 0x015C, 0x0165]
+gear_names = ["Heretic Rod", "Acacia Hat", "Black Robe", "Ninja Tabi", "Angel Ring"]
 
 [builds.illusionist_hume]
 name = "Hume Illusionist"
 race = "Hume"
 job = "Illusionist"
 job_id = 9
-description = "Battlefield-wide illusionist with Princess Rod, Acacia Hat, Black Robe, and Angel Ring"
-gear = [0x0091, 0x011E, 0x014B, 0x015C, 0x0165]
-gear_names = ["Princess Rod", "Acacia Hat", "Black Robe", "Ninja Tabi", "Angel Ring"]
+description = "Battlefield-wide illusionist with Heretic Rod (+20 MagPow), Acacia Hat, Black Robe, and Angel Ring"
+gear = [0x0093, 0x011E, 0x014B, 0x015C, 0x0165]
+gear_names = ["Heretic Rod", "Acacia Hat", "Black Robe", "Ninja Tabi", "Angel Ring"]
 
 [builds.archer_hume]
 name = "Hume Archer"
@@ -276,18 +276,18 @@ name = "Moogle Black Mage"
 race = "Moogle"
 job = "Black Mage"
 job_id = 42
-description = "Elemental magic caster with Princess Rod, Acacia Hat, Black Robe, and Angel Ring"
-gear = [0x0091, 0x011E, 0x014B, 0x015C, 0x0165]
-gear_names = ["Princess Rod", "Acacia Hat", "Black Robe", "Ninja Tabi", "Angel Ring"]
+description = "Elemental magic caster with Heretic Rod (+20 MagPow), Acacia Hat, Black Robe, and Angel Ring"
+gear = [0x0093, 0x011E, 0x014B, 0x015C, 0x0165]
+gear_names = ["Heretic Rod", "Acacia Hat", "Black Robe", "Ninja Tabi", "Angel Ring"]
 
 [builds.time_mage_moogle]
 name = "Moogle Time Mage"
 race = "Moogle"
 job = "Time Mage"
 job_id = 43
-description = "Temporal manipulator with Princess Rod, Acacia Hat, Black Robe, and Angel Ring"
-gear = [0x0091, 0x011E, 0x014B, 0x015C, 0x0165]
-gear_names = ["Princess Rod", "Acacia Hat", "Black Robe", "Ninja Tabi", "Angel Ring"]
+description = "Temporal manipulator with Heretic Rod (+20 MagPow), Acacia Hat, Black Robe, and Angel Ring"
+gear = [0x0093, 0x011E, 0x014B, 0x015C, 0x0165]
+gear_names = ["Heretic Rod", "Acacia Hat", "Black Robe", "Ninja Tabi", "Angel Ring"]
 
 [builds.warrior]
 name = "Bangaa Warrior"
@@ -312,9 +312,9 @@ name = "Bangaa Bishop"
 race = "Bangaa"
 job = "Bishop"
 job_id = 18
-description = "Holy elemental mage with Nirvana Staff, Acacia Hat, Black Robe, Ninja Tabi, and Angel Ring"
-gear = [0x0083, 0x011E, 0x014B, 0x015C, 0x0165]
-gear_names = ["Nirvana Staff", "Acacia Hat", "Black Robe", "Ninja Tabi", "Angel Ring"]
+description = "Holy elemental mage with Dream Watcher (+10 MagPow, +15 MagRes), Acacia Hat, Black Robe, Ninja Tabi, and Angel Ring"
+gear = [0x0086, 0x011E, 0x014B, 0x015C, 0x0165]
+gear_names = ["Dream Watcher", "Acacia Hat", "Black Robe", "Ninja Tabi", "Angel Ring"]
 
 [builds.templar]
 name = "Bangaa Templar"
@@ -330,36 +330,36 @@ name = "Nu Mou White Mage"
 race = "Nu Mou"
 job = "White Mage"
 job_id = 20
-description = "Holy healer with Nirvana Staff, Acacia Hat, White Robe, Ninja Tabi, and Angel Ring"
-gear = [0x0083, 0x011E, 0x014A, 0x015C, 0x0165]
-gear_names = ["Nirvana Staff", "Acacia Hat", "White Robe", "Ninja Tabi", "Angel Ring"]
+description = "Holy healer with Dream Watcher (+10 MagPow, +15 MagRes), Acacia Hat, White Robe, Ninja Tabi, and Angel Ring"
+gear = [0x0086, 0x011E, 0x014A, 0x015C, 0x0165]
+gear_names = ["Dream Watcher", "Acacia Hat", "White Robe", "Ninja Tabi", "Angel Ring"]
 
 [builds.black_mage_numou]
 name = "Nu Mou Black Mage"
 race = "Nu Mou"
 job = "Black Mage"
 job_id = 21
-description = "Elemental magic caster with Princess Rod, Acacia Hat, Black Robe, Ninja Tabi, and Angel Ring"
-gear = [0x0091, 0x011E, 0x014B, 0x015C, 0x0165]
-gear_names = ["Princess Rod", "Acacia Hat", "Black Robe", "Ninja Tabi", "Angel Ring"]
+description = "Elemental magic caster with Heretic Rod (+20 MagPow), Acacia Hat, Black Robe, Ninja Tabi, and Angel Ring"
+gear = [0x0093, 0x011E, 0x014B, 0x015C, 0x0165]
+gear_names = ["Heretic Rod", "Acacia Hat", "Black Robe", "Ninja Tabi", "Angel Ring"]
 
 [builds.time_mage_numou]
 name = "Nu Mou Time Mage"
 race = "Nu Mou"
 job = "Time Mage"
 job_id = 22
-description = "Temporal manipulator with Princess Rod, Acacia Hat, Black Robe, Ninja Tabi, and Angel Ring"
-gear = [0x0091, 0x011E, 0x014B, 0x015C, 0x0165]
-gear_names = ["Princess Rod", "Acacia Hat", "Black Robe", "Ninja Tabi", "Angel Ring"]
+description = "Temporal manipulator with Heretic Rod (+20 MagPow), Acacia Hat, Black Robe, Ninja Tabi, and Angel Ring"
+gear = [0x0093, 0x011E, 0x014B, 0x015C, 0x0165]
+gear_names = ["Heretic Rod", "Acacia Hat", "Black Robe", "Ninja Tabi", "Angel Ring"]
 
 [builds.illusionist_numou]
 name = "Nu Mou Illusionist"
 race = "Nu Mou"
 job = "Illusionist"
 job_id = 23
-description = "Map-wide phantasm caster with Princess Rod, Acacia Hat, Black Robe, Ninja Tabi, and Angel Ring"
-gear = [0x0091, 0x011E, 0x014B, 0x015C, 0x0165]
-gear_names = ["Princess Rod", "Acacia Hat", "Black Robe", "Ninja Tabi", "Angel Ring"]
+description = "Map-wide phantasm caster with Heretic Rod (+20 MagPow), Acacia Hat, Black Robe, Ninja Tabi, and Angel Ring"
+gear = [0x0093, 0x011E, 0x014B, 0x015C, 0x0165]
+gear_names = ["Heretic Rod", "Acacia Hat", "Black Robe", "Ninja Tabi", "Angel Ring"]
 
 [builds.alchemist]
 name = "Nu Mou Alchemist"
