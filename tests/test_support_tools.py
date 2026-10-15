@@ -5,7 +5,7 @@ import tempfile
 import unittest
 
 from support.fix_save_crc import fix_file_crc
-from support.generate_race_save import RACE_JOB_MAP, generate_race_fleet
+from support.generate_race_save import generate_race_fleet
 from support.inspect_rom import inspect_items, inspect_jobs, inspect_names, inspect_races
 from support.sync_pocket import get_file_md5, sync_file
 from support.validate_saves import validate_save_file
@@ -60,6 +60,23 @@ class TestSupportTools(unittest.TestCase):
             self.assertTrue(os.path.exists(gba_path))
             self.assertTrue(validate_save_file(sav_path, verbose=False))
             self.assertTrue(fix_file_crc(sav_path))
+
+    def test_topup_clan_units_temp(self):
+        """Verifies topup_save on a temporary copy of base save."""
+        import shutil
+
+        from support.topup_clan_units import topup_save
+
+        base_sav = "/home/izaac/Documents/FFTA_Assets/Final Fantasy Tactics Advance (U) [!].sav"
+        if not os.path.exists(base_sav):
+            self.skipTest("Base save not found in environment.")
+
+        with tempfile.TemporaryDirectory() as tmpdir:
+            copy_path = os.path.join(tmpdir, "test_topup.sav")
+            shutil.copy2(base_sav, copy_path)
+            res = topup_save(save_path=copy_path, target_slot=1, target_units=[2, 3], sync=False)
+            self.assertTrue(res)
+            self.assertTrue(validate_save_file(copy_path, verbose=False))
 
 
 if __name__ == "__main__":
