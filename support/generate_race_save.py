@@ -319,6 +319,9 @@ def main():
     parser.add_argument("--sync", action="store_true", help="Sync to Analogue Pocket SD card after generation")
     args = parser.parse_args()
 
+    if args.level is not None and not (1 <= args.level <= 99):
+        parser.error(f"--level must be between 1 and 99 (got {args.level})")
+
     races_to_generate = []
     if args.race.lower() == "all":
         races_to_generate = list(RACE_JOB_MAP.keys())

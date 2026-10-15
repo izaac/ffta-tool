@@ -194,6 +194,28 @@ Examples:
 
     args = parser.parse_args()
 
+    # Input validation / safety guards
+    if args.monster_level is not None and not (1 <= args.monster_level <= 99):
+        parser.error(f"--monster-level must be between 1 and 99 (got {args.monster_level})")
+
+    if args.monster_stats is not None and not (1 <= args.monster_stats <= 999):
+        parser.error(f"--monster-stats must be between 1 and 999 (got {args.monster_stats})")
+
+    if args.monster_affection is not None and not (0 <= args.monster_affection <= 100):
+        parser.error(f"--monster-affection must be between 0 and 100 (got {args.monster_affection})")
+
+    if args.level is not None and not (1 <= args.level <= 99):
+        parser.error(f"--level must be between 1 and 99 (got {args.level})")
+
+    if args.unit is not None and not (0 <= args.unit <= 23):
+        parser.error(f"--unit must be between 0 and 23 (got {args.unit})")
+
+    if args.equip_qty is not None and not (1 <= args.equip_qty <= 99):
+        parser.error(f"--equip-qty must be between 1 and 99 (got {args.equip_qty})")
+
+    if args.item_qty is not None and not (1 <= args.item_qty <= 99):
+        parser.error(f"--item-qty must be between 1 and 99 (got {args.item_qty})")
+
     # Save file resolution
     target_path = args.save_file
     if target_path:

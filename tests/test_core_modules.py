@@ -79,6 +79,32 @@ class TestCoreModules(unittest.TestCase):
         self.assertTrue(callable(core.cli.main))
         self.assertTrue(callable(ffta_tool.main))
 
+    def test_cli_safety_guards(self):
+        """Ensure CLI rejects invalid inputs for monster-level, monster-stats, unit, etc."""
+        from unittest.mock import patch
+
+        invalid_cases = [
+            ["ffta_tool", "--monster-level", "0"],
+            ["ffta_tool", "--monster-level", "100"],
+            ["ffta_tool", "--monster-stats", "0"],
+            ["ffta_tool", "--monster-stats", "1000"],
+            ["ffta_tool", "--monster-affection", "-1"],
+            ["ffta_tool", "--monster-affection", "101"],
+            ["ffta_tool", "--level", "0"],
+            ["ffta_tool", "--level", "100"],
+            ["ffta_tool", "--unit", "24"],
+            ["ffta_tool", "--unit", "-1"],
+            ["ffta_tool", "--equip-qty", "0"],
+            ["ffta_tool", "--equip-qty", "100"],
+            ["ffta_tool", "--item-qty", "0"],
+            ["ffta_tool", "--item-qty", "100"],
+        ]
+        for cmd in invalid_cases:
+            with patch.object(sys, "argv", cmd):
+                with self.assertRaises(SystemExit) as cm:
+                    core.cli.main()
+                self.assertEqual(cm.exception.code, 2)
+
 
 if __name__ == "__main__":
     unittest.main()

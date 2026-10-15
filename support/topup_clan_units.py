@@ -265,7 +265,20 @@ def main():
     parser.add_argument("--sync", action="store_true", help="Sync to Analogue Pocket SD card")
     args = parser.parse_args()
 
-    unit_list = [int(x.strip()) for x in args.units.split(",") if x.strip()]
+    # Safety guards
+    if args.monster_level is not None and not (1 <= args.monster_level <= 99):
+        parser.error(f"--monster-level must be between 1 and 99 (got {args.monster_level})")
+
+    if args.monster_stats is not None and not (1 <= args.monster_stats <= 999):
+        parser.error(f"--monster-stats must be between 1 and 999 (got {args.monster_stats})")
+
+    try:
+        unit_list = [int(x.strip()) for x in args.units.split(",") if x.strip()]
+        for u in unit_list:
+            if not (0 <= u <= 23):
+                parser.error(f"Unit index must be between 0 and 23 (got {u})")
+    except ValueError:
+        parser.error(f"Invalid units list format: {args.units}")
     topup_save(
         save_path=args.save_path,
         target_slot=args.slot - 1,
