@@ -707,7 +707,25 @@ class TestFftaTool(unittest.TestCase):
             self.assertEqual(job_id, expected_job_id, f"Job ID mismatch for {query}")
             self.assertEqual(len(gear), 5, f"Gear must have 5 items for {query}")
             self.assertTrue(all(item > 0 for item in gear), f"Gear items must all be non-zero for {query}")
-            self.assertIn("Moogle", title)
+
+    def test_bangaa_builds_resolution(self):
+        """Verifies all 7 Bangaa jobs resolve from builds.toml with full equipment sets."""
+        bangaa_jobs = [
+            ("warrior", 0x0D),
+            ("dragoon", 0x0E),
+            ("defender", 0x0F),
+            ("gladiator", 0x10),
+            ("white_monk", 0x11),
+            ("bishop", 0x12),
+            ("templar", 0x13),
+        ]
+        for query, expected_job_id in bangaa_jobs:
+            job_id, race_id, gear, title = resolve_job_and_race(query)
+            self.assertEqual(race_id, 2, f"Race must be Bangaa (2) for {query}")
+            self.assertEqual(job_id, expected_job_id, f"Job ID mismatch for {query}")
+            self.assertEqual(len(gear), 5, f"Gear must have 5 items for {query}")
+            self.assertTrue(all(item > 0 for item in gear), f"Gear items must all be non-zero for {query}")
+            self.assertIn("Bangaa", title)
 
     @unittest.skipUnless(
         os.path.exists(

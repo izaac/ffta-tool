@@ -5,9 +5,10 @@
 name = "Bangaa Gladiator"
 race = "Bangaa"
 job = "Gladiator"
-description = "High physical damage with Ebon Blade, Genji Helm, Ninja Gear, Ninja Tabi, and Mindu Gem"
-gear = [0x001C, 0x0138, 0x010E, 0x015C, 0x0169]
-gear_names = ["Ebon Blade", "Ninja Gear", "Genji Helm", "Ninja Tabi", "Mindu Gem"]
+job_id = 16
+description = "Ultima Sword striker with Materia Blade, Thief Hat, Ninja Gear, Ninja Tabi, and Genji Armlets"
+gear = [0x001A, 0x011B, 0x0138, 0x015C, 0x0160]
+gear_names = ["Materia Blade", "Thief Hat", "Ninja Gear", "Ninja Tabi", "Genji Armlets"]
 
 [builds.blue_mage]
 name = "Hume Dual-Wield Blue Mage"
@@ -119,15 +120,17 @@ gear_names = ["Max's Oathbow", "Ribbon", "Ninja Gear", "Ninja Tabi", "Genji Arml
 name = "Bangaa White Monk"
 race = "Bangaa"
 job = "White Monk"
-description = "Martial artist with Bangaa Spike, Maximillian, and Mindu Gem"
-gear = [0x00C8, 0x012B, 0x0111, 0x015C, 0x0169]
-gear_names = ["Bangaa Spike", "Maximillian", "Bangaa Helm", "Ninja Tabi", "Mindu Gem"]
+job_id = 17
+description = "Ranged martial artist with Godhand, Ninja Gear, Ninja Tabi, Mindu Gem, and Genji Armlets"
+gear = [0x00DF, 0x0138, 0x015C, 0x0169, 0x0160]
+gear_names = ["Godhand", "Ninja Gear", "Ninja Tabi", "Mindu Gem", "Genji Armlets"]
 
 [builds.dragoon]
 name = "Bangaa Dragoon"
 race = "Bangaa"
 job = "Dragoon"
-description = "High physical spear piercer with Bangaa Spike, Maximillian, and Mindu Gem"
+job_id = 14
+description = "High physical spear piercer with Bangaa Spike, Maximillian, Bangaa Helm, Ninja Tabi, and Mindu Gem"
 gear = [0x00C8, 0x012B, 0x0111, 0x015C, 0x0169]
 gear_names = ["Bangaa Spike", "Maximillian", "Bangaa Helm", "Ninja Tabi", "Mindu Gem"]
 
@@ -269,4 +272,41 @@ job_id = 43
 description = "Temporal manipulator with Princess Rod, Acacia Hat, Black Robe, and Angel Ring"
 gear = [0x0091, 0x011E, 0x014B, 0x015C, 0x0165]
 gear_names = ["Princess Rod", "Acacia Hat", "Black Robe", "Ninja Tabi", "Angel Ring"]
+
+[builds.warrior]
+name = "Bangaa Warrior"
+race = "Bangaa"
+job = "Warrior"
+job_id = 13
+description = "Heavy sword frontliner with Chirijiraden, Genji Shield, Genji Helm, and Maximillian"
+gear = [0x000C, 0x0103, 0x010E, 0x012B, 0x015C]
+gear_names = ["Chirijiraden", "Genji Shield", "Genji Helm", "Maximillian", "Ninja Tabi"]
+
+[builds.defender]
+name = "Bangaa Defender"
+race = "Bangaa"
+job = "Defender"
+job_id = 15
+description = "Impenetrable knightsword fortress with Arch Sword, Genji Shield, Genji Helm, and Maximillian"
+gear = [0x002E, 0x0103, 0x010E, 0x012B, 0x015C]
+gear_names = ["Arch Sword", "Genji Shield", "Genji Helm", "Maximillian", "Ninja Tabi"]
+
+[builds.bishop]
+name = "Bangaa Bishop"
+race = "Bangaa"
+job = "Bishop"
+job_id = 18
+description = "Holy elemental mage with Spring Staff, Acacia Hat, Black Robe, Ninja Tabi, and Angel Ring"
+gear = [0x0080, 0x011E, 0x014B, 0x015C, 0x0165]
+gear_names = ["Spring Staff", "Acacia Hat", "Black Robe", "Ninja Tabi", "Angel Ring"]
+
+[builds.templar]
+name = "Bangaa Templar"
+race = "Bangaa"
+job = "Templar"
+job_id = 19
+description = "Holy knight with Arch Sword, Genji Shield, Genji Helm, Maximillian, and Ninja Tabi"
+gear = [0x002E, 0x0103, 0x010E, 0x012B, 0x015C]
+gear_names = ["Arch Sword", "Genji Shield", "Genji Helm", "Maximillian", "Ninja Tabi"]
+
 
