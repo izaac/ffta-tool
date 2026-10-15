@@ -72,3 +72,12 @@ job = "White Monk"
 description = "Martial artist with Bangaa Spike, Maximillian, and Mindu Gem"
 gear = [0x00C8, 0x012B, 0x0111, 0x015C, 0x0169]
 gear_names = ["Bangaa Spike", "Maximillian", "Bangaa Helm", "Ninja Tabi", "Mindu Gem"]
+
+[builds.morpher]
+name = "Nu Mou Morpher"
+race = "Nu Mou"
+job = "Morpher"
+description = "High-speed beast transformer with Black Robe elemental boost"
+gear = [0x00E8, 0x014B, 0x011E, 0x015C, 0x0165]
+gear_names = ["Dragon Soul", "Black Robe", "Acacia Hat", "Ninja Tabi", "Angel Ring"]
+
