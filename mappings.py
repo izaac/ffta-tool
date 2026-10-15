@@ -16,7 +16,7 @@ RACE_NAMES: dict[int, str] = {
 # Jobs (Hex ID -> (Job Name, Race))
 JOB_NAMES: dict[int, tuple[str, str]] = {
     # Hume (0x01..0x0C)
-    0x01: ("Soldier", "Hume"),
+    0x01: ("Soldier (Prologue)", "Hume"),
     0x02: ("Soldier", "Hume"),
     0x03: ("Paladin", "Hume"),
     0x04: ("Fighter", "Hume"),
