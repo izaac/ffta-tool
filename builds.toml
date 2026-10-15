@@ -163,7 +163,23 @@ gear_names = ["Ebon Blade", "Thief Hat", "Ninja Gear", "Ninja Tabi", "Genji Arml
 name = "Hume Thief"
 race = "Hume"
 job = "Thief"
-description = "Lightning fast looter with dual Cinquedea speed stack (+10 Speed)"
+description = "High-accuracy looter with Cinquedea, Thief Hat, Ninja Gear, Ninja Tabi, Genji Armlets, and Concentrate (95% Steal rate)"
+reaction = "Reflex"
+reaction_id = 20
+support = "Concentrate"
+support_id = 127
+gear = [0x0054, 0x011B, 0x0138, 0x015C, 0x0160]
+gear_names = ["Cinquedea", "Thief Hat", "Ninja Gear", "Ninja Tabi", "Genji Armlets"]
+
+[builds.thief_speed]
+name = "Hume Speed Thief"
+race = "Hume"
+job = "Thief"
+description = "Lightning fast looter with dual Cinquedea speed stack (+10 Speed), Double Sword, and Reflex"
+reaction = "Reflex"
+reaction_id = 20
+support = "Double Sword"
+support_id = 56
 gear = [0x0054, 0x0054, 0x011B, 0x0138, 0x015C]
 gear_names = ["Cinquedea", "Cinquedea", "Thief Hat", "Ninja Gear", "Ninja Tabi"]
 

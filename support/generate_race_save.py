@@ -135,7 +135,7 @@ def setup_marche(sav_data: bytearray, sec0_offset: int):
     ub[0x34] = 142  # Race ability base
     ub[0x35] = 11  # Primary A-Set: Blue Magic
     ub[0x36] = 4  # Secondary A-Set: Fighter Tech
-    ub[0x3A] = 31  # Reflex
+    ub[0x3A] = 20  # Reflex
     ub[0x3B] = 56  # Double Sword
     ub[0x3C] = 117  # Blue Combo
 

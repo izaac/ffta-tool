@@ -535,7 +535,7 @@ DEFAULT_SECONDARY_JOBS: dict[int, int] = {1: 4, 2: 17, 3: 22, 4: 35, 5: 37}
 DEFAULT_SECONDARY_A_SETS: dict[int, int] = {1: 4, 2: 22, 3: 13, 4: 26, 5: 32}
 ALTERNATE_SECONDARY_JOBS: dict[int, int] = {1: 3, 2: 16, 3: 27, 4: 34, 5: 38}
 ALTERNATE_SECONDARY_A_SETS: dict[int, int] = {1: 3, 2: 8, 3: 18, 4: 25, 5: 28}
-DEFAULT_REACTION_IDS: dict[int, int] = {1: 31, 2: 20, 3: 91, 4: 9, 5: 64}  # Reflex / Dragonheart / Damage > MP
+DEFAULT_REACTION_IDS: dict[int, int] = {1: 20, 2: 20, 3: 91, 4: 9, 5: 64}  # Reflex (20) / Dragonheart / Damage > MP
 DEFAULT_SUPPORT_IDS: dict[int, int] = {1: 56, 2: 75, 3: 53, 4: 63, 5: 30}  # Double Sword / WAtk+ / Turbo MP / Conc
 DEFAULT_COMBO_IDS: dict[int, int] = {1: 117, 2: 43, 3: 94, 4: 74, 5: 31}
 

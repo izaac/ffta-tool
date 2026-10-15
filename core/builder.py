@@ -112,6 +112,10 @@ def equip_unit_build(
                 b_name = selected_build.get("name", "Build")
                 print(f"  [+] Unit {u} ({race_name} {job_name}): Equipped {b_name} [{gear_str}]")
                 equipped_count += 1
+            if "reaction_id" in selected_build:
+                sav_data[u_addr + 0x3A] = selected_build["reaction_id"]
+            if "support_id" in selected_build:
+                sav_data[u_addr + 0x3B] = selected_build["support_id"]
 
     if bump_counter and equipped_count > 0:
         new_counter = info["counter"] + 1
@@ -237,6 +241,15 @@ def inject_unit(
     race_name = RACE_NAMES[race_id]
     job_title = JOB_NAMES[job_id][0]
 
+    builds = load_builds(builds_path)
+    b_key = build_or_job.strip().lower().replace("-", "_").replace(" ", "_")
+    selected_build = builds.get(b_key)
+    if not selected_build and builds:
+        for b_val in builds.values():
+            if b_val.get("name", "").lower() == build_or_job.strip().lower():
+                selected_build = b_val
+                break
+
     # Resolve unit name
     if name is not None:
         clean_name = str(name).strip()
@@ -334,9 +347,17 @@ def inject_unit(
     # 0x36: Secondary A-ability set
     ub[0x36] = sec_a_set
     # 0x3A: Reaction ability
-    ub[0x3A] = DEFAULT_REACTION_IDS.get(race_id, 0)
+    r_id = selected_build.get("reaction_id") if selected_build else None
+    if r_id is None:
+        r_id = DEFAULT_REACTION_IDS.get(race_id, 0)
+    ub[0x3A] = r_id
+
     # 0x3B: Support ability
-    ub[0x3B] = DEFAULT_SUPPORT_IDS.get(race_id, 0)
+    s_id = selected_build.get("support_id") if selected_build else None
+    if s_id is None:
+        s_id = DEFAULT_SUPPORT_IDS.get(race_id, 0)
+    ub[0x3B] = s_id
+
     # 0x3C: Combo ability
     ub[0x3C] = DEFAULT_COMBO_IDS.get(race_id, 0)
 

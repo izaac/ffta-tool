@@ -47,6 +47,7 @@ A critical distinction between *Final Fantasy Tactics Advance* (GBA) and its Nin
 - **Blue Mage**: Dual Tulwars (+4 Speed total, 43 Atk each), Acacia Hat (+2 Speed, +20 Res), Ninja Gear (+2 Speed), Fairy Shoes (teleport mobility). Master of crowd control (Night, Roulette, Bad Breath).
 - **Paladin**: Dual Arch Swords (82 Atk each) delivering Holy Blade strikes, Maximillian (+62 Def plate), Mindu Gem (complete status immunity), and Ninja Tabi (+2 Move).
 - **Fighter**: Ebon Blade (84 Atk) with Air Render and Back Draft.
+- **Thief**: Cinquedea (57 Atk, +5 Speed) paired with Concentrate (guarantees 95% Steal rate on Weapon, Armor, and Ability), Reflex (100% physical evasion), Thief Hat, Ninja Gear, Ninja Tabi, and Genji Armlets. Dual Cinquedea Double Sword variant also available for raw speed stack (+10 Speed).
 - **Default Secondary**: Fighter Tech (Set 4). If primary is Fighter, falls back to Paladin Holy Blade (Set 3).
 
 ### Bangaa Fleet (Heavy Physical Dominance)
