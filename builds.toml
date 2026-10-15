@@ -309,4 +309,59 @@ description = "Holy knight with Arch Sword, Genji Shield, Genji Helm, Maximillia
 gear = [0x002E, 0x0103, 0x010E, 0x012B, 0x015C]
 gear_names = ["Arch Sword", "Genji Shield", "Genji Helm", "Maximillian", "Ninja Tabi"]
 
+[builds.white_mage_numou]
+name = "Nu Mou White Mage"
+race = "Nu Mou"
+job = "White Mage"
+job_id = 20
+description = "Holy healer with Nirvana Staff, Acacia Hat, White Robe, Ninja Tabi, and Angel Ring"
+gear = [0x0083, 0x011E, 0x014A, 0x015C, 0x0165]
+gear_names = ["Nirvana Staff", "Acacia Hat", "White Robe", "Ninja Tabi", "Angel Ring"]
+
+[builds.black_mage_numou]
+name = "Nu Mou Black Mage"
+race = "Nu Mou"
+job = "Black Mage"
+job_id = 21
+description = "Elemental magic caster with Princess Rod, Acacia Hat, Black Robe, Ninja Tabi, and Angel Ring"
+gear = [0x0091, 0x011E, 0x014B, 0x015C, 0x0165]
+gear_names = ["Princess Rod", "Acacia Hat", "Black Robe", "Ninja Tabi", "Angel Ring"]
+
+[builds.time_mage_numou]
+name = "Nu Mou Time Mage"
+race = "Nu Mou"
+job = "Time Mage"
+job_id = 22
+description = "Temporal manipulator with Princess Rod, Acacia Hat, Black Robe, Ninja Tabi, and Angel Ring"
+gear = [0x0091, 0x011E, 0x014B, 0x015C, 0x0165]
+gear_names = ["Princess Rod", "Acacia Hat", "Black Robe", "Ninja Tabi", "Angel Ring"]
+
+[builds.illusionist_numou]
+name = "Nu Mou Illusionist"
+race = "Nu Mou"
+job = "Illusionist"
+job_id = 23
+description = "Map-wide phantasm caster with Princess Rod, Acacia Hat, Black Robe, Ninja Tabi, and Angel Ring"
+gear = [0x0091, 0x011E, 0x014B, 0x015C, 0x0165]
+gear_names = ["Princess Rod", "Acacia Hat", "Black Robe", "Ninja Tabi", "Angel Ring"]
+
+[builds.alchemist]
+name = "Nu Mou Alchemist"
+race = "Nu Mou"
+job = "Alchemist"
+job_id = 24
+description = "Item and transmuter expert with Scorpion Tail, Acacia Hat, Magic Robe, Ninja Tabi, and Angel Ring"
+gear = [0x009D, 0x011E, 0x0151, 0x015C, 0x0165]
+gear_names = ["Scorpion Tail", "Acacia Hat", "Magic Robe", "Ninja Tabi", "Angel Ring"]
+
+[builds.beastmaster]
+name = "Nu Mou Beastmaster"
+race = "Nu Mou"
+job = "Beastmaster"
+job_id = 25
+description = "Monster controller with Blood Strings, Thief Hat, Ninja Gear, Ninja Tabi, and Angel Ring"
+gear = [0x00D3, 0x011B, 0x0138, 0x015C, 0x0165]
+gear_names = ["Blood Strings", "Thief Hat", "Ninja Gear", "Ninja Tabi", "Angel Ring"]
+
+
 
