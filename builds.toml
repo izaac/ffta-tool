@@ -5,9 +5,9 @@
 name = "Bangaa Gladiator"
 race = "Bangaa"
 job = "Gladiator"
-description = "High physical damage with Ebon Blade, Ninja Gear, Ninja Tabi, and Mindu Gem"
-gear = [0x001C, 0x0138, 0x011B, 0x015C, 0x0169]
-gear_names = ["Ebon Blade", "Ninja Gear", "Thief Hat", "Ninja Tabi", "Mindu Gem"]
+description = "High physical damage with Ebon Blade, Genji Helm, Ninja Gear, Ninja Tabi, and Mindu Gem"
+gear = [0x001C, 0x0138, 0x010E, 0x015C, 0x0169]
+gear_names = ["Ebon Blade", "Ninja Gear", "Genji Helm", "Ninja Tabi", "Mindu Gem"]
 
 [builds.blue_mage]
 name = "Hume Dual-Wield Blue Mage"
