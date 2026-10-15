@@ -1,0 +1,74 @@
+# Final Fantasy Tactics Advance (GBA) - Clan Equipment Builds Database
+# Sourced directly from Chief's active playthrough save files and optimal setups.
+
+[builds.gladiator]
+name = "Bangaa Gladiator"
+race = "Bangaa"
+job = "Gladiator"
+description = "High physical damage with Ebon Blade, Ninja Gear, and Ninja Tabi"
+gear = [0x001C, 0x0000, 0x011B, 0x0138, 0x015C]
+gear_names = ["Ebon Blade", "-", "Thief Hat", "Ninja Gear", "Ninja Tabi"]
+
+[builds.blue_mage]
+name = "Hume Dual-Wield Blue Mage"
+race = "Hume"
+job = "Blue Mage"
+description = "Dual Tulwar setup with Acacia Hat and high mobility"
+gear = [0x0026, 0x0026, 0x011E, 0x0138, 0x015A]
+gear_names = ["Tulwar", "Tulwar", "Acacia Hat", "Ninja Gear", "Fairy Shoes"]
+
+[builds.paladin]
+name = "Hume Dual-Wield Paladin"
+race = "Hume"
+job = "Paladin"
+description = "Dual Arch Sword holy warrior with Maximillian plate defense"
+gear = [0x002E, 0x002E, 0x012B, 0x0167, 0x015C]
+gear_names = ["Arch Sword", "Arch Sword", "Maximillian", "Ruby Earring", "Ninja Tabi"]
+
+[builds.gunner]
+name = "Moogle Long-Range Gunner"
+race = "Moogle"
+job = "Gunner"
+description = "Long range calling gun sniper with status immunity"
+gear = [0x00FC, 0x0000, 0x011B, 0x0138, 0x015C]
+gear_names = ["Calling Gun", "-", "Thief Hat", "Ninja Gear", "Ninja Tabi"]
+
+[builds.sage]
+name = "Nu Mou Sage"
+race = "Nu Mou"
+job = "Sage"
+description = "Spellcaster with Sage Crosier, Magic Robe, and Ninja Tabi"
+gear = [0x0098, 0x0000, 0x011E, 0x0151, 0x015C]
+gear_names = ["Sage Crosier", "-", "Acacia Hat", "Magic Robe", "Ninja Tabi"]
+
+[builds.assassin]
+name = "Viera Speed Assassin"
+race = "Viera"
+job = "Assassin"
+description = "High speed Masamune 100 with Ribbon and Angel Ring"
+gear = [0x0076, 0x0000, 0x0114, 0x0138, 0x015C]
+gear_names = ["Masamune 100", "-", "Ribbon", "Ninja Gear", "Ninja Tabi"]
+
+[builds.juggler]
+name = "Moogle Juggler"
+race = "Moogle"
+job = "Juggler"
+description = "High speed disabler with Cinquedea and Ninja Tabi"
+gear = [0x0054, 0x0000, 0x011E, 0x0138, 0x015C]
+gear_names = ["Cinquedea", "-", "Acacia Hat", "Ninja Gear", "Ninja Tabi"]
+
+[builds.red_mage]
+name = "Viera Red Mage"
+race = "Viera"
+job = "Red Mage"
+description = "Doublecast rapier specialist with Ribbon and Genji Armlets"
+gear = [0x0069, 0x0000, 0x0114, 0x0138, 0x015C]
+gear_names = ["Aerial Hole", "-", "Ribbon", "Ninja Gear", "Ninja Tabi"]
+
+[builds.white_monk]
+name = "Bangaa White Monk"
+race = "Bangaa"
+job = "White Monk"
+description = "Martial artist with Bangaa Spike, Maximillian, and Mindu Gem"
+gear = [0x00C8, 0x0000, 0x0111, 0x012B, 0x015C]
+gear_names = ["Bangaa Spike", "-", "Bangaa Helm", "Maximillian", "Ninja Tabi"]

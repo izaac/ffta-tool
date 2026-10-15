@@ -21,9 +21,11 @@ from ffta_tool import (
     clear_clan_cards,
     compute_crc,
     create_snapshot_backup,
+    equip_unit_build,
     fix_crc,
     get_default_backup_dir,
     get_slots,
+    load_builds,
     load_config,
     parse_simple_toml,
     patch_clan_units,
@@ -461,6 +463,57 @@ class TestFftaTool(unittest.TestCase):
             cfg = {"paths": {"search_paths": [os.path.join(tmpdir, "*.sav")]}}
             detected = auto_detect_save(cfg)
             self.assertEqual(detected, save_path)
+
+    def test_load_builds(self):
+        """Verifies load_builds reads builds.toml correctly and handles missing files."""
+        builds = load_builds()
+        self.assertIn("gladiator", builds)
+        self.assertIn("blue_mage", builds)
+        self.assertIn("paladin", builds)
+        self.assertEqual(builds["gladiator"]["name"], "Bangaa Gladiator")
+        self.assertEqual(len(builds["gladiator"]["gear"]), 5)
+
+        # Missing file returns empty dict
+        empty = load_builds("/nonexistent/path/builds.toml")
+        self.assertEqual(empty, {})
+
+    def test_equip_unit_build(self):
+        """Verifies equip_unit_build equips matching optimal gear and updates CRC."""
+        buf = bytearray(self.mock_data)
+        # Unit 1 in mock Slot 2 is Bangaa White Monk (Job 0x0E)
+        u1_off = 4 * SECTOR_SIZE + 0x80 + 1 * 0x108
+        # Clear gear first
+        buf[u1_off + 0x2A : u1_off + 0x34] = bytes(10)
+
+        patched = equip_unit_build(buf, target_slot=1, target_unit=1)
+        slots = get_slots(patched)
+        self.assertTrue(slots[1]["valid"], "CRC must be valid after equipping build")
+
+        # White Monk gear: [0x00C8, 0x0000, 0x0111, 0x012B, 0x015C]
+        expected_gear = struct.pack("<5H", 0x00C8, 0x0000, 0x0111, 0x012B, 0x015C)
+        self.assertEqual(patched[u1_off + 0x2A : u1_off + 0x34], expected_gear)
+
+    def test_clear_clan_cards_auto_re_equip(self):
+        """Verifies clear_clan_cards pardons jailed unit and auto re-equips if naked."""
+        buf = bytearray(self.mock_data)
+        s4_off = 4 * SECTOR_SIZE
+        u1_off = s4_off + 0x80 + 1 * 0x108
+
+        # Incarcerate unit 1 and strip gear
+        buf[u1_off + 0x28] = 0x08
+        buf[u1_off + 0x101] = 0x03
+        buf[u1_off + 0x104] = 0x03
+        buf[u1_off + 0x2A : u1_off + 0x34] = bytes(10)
+
+        cleared = clear_clan_cards(buf, target_slot=1, re_equip=True)
+        slots = get_slots(cleared)
+        self.assertTrue(slots[1]["valid"], "CRC must be valid after card clearing")
+        self.assertEqual(cleared[u1_off + 0x28] & 0x08, 0, "Jail status cleared")
+        self.assertEqual(cleared[u1_off + 0x104], 0xFF, "Unit state reset to free")
+
+        # Gear should have been auto re-equipped from builds.toml
+        expected_gear = struct.pack("<5H", 0x00C8, 0x0000, 0x0111, 0x012B, 0x015C)
+        self.assertEqual(cleared[u1_off + 0x2A : u1_off + 0x34], expected_gear)
 
 
 if __name__ == "__main__":

@@ -503,7 +503,104 @@ def patch_clan_units(sav_data, target_slot=1, target_unit=None):
     return sav_data
 
 
-def clear_clan_cards(sav_data, target_slot=1):
+def load_builds(builds_path=None) -> dict:
+    """Loads builds database from TOML file."""
+    target = None
+    if builds_path:
+        target = Path(os.path.expanduser(builds_path))
+    else:
+        local_b = Path("builds.toml")
+        if local_b.is_file():
+            target = local_b
+        else:
+            xdg_config = os.environ.get("XDG_CONFIG_HOME")
+            if xdg_config:
+                user_b = Path(xdg_config) / "ffta-tool" / "builds.toml"
+            else:
+                user_b = Path.home() / ".config" / "ffta-tool" / "builds.toml"
+            if user_b.is_file():
+                target = user_b
+
+    if not target or not target.is_file():
+        return {}
+
+    with open(target, encoding="utf-8") as f:
+        content = f.read()
+
+    if tomllib is not None:
+        try:
+            return tomllib.loads(content).get("builds", {})
+        except Exception:
+            return parse_simple_toml(content).get("builds", {})
+    return parse_simple_toml(content).get("builds", {})
+
+
+def equip_unit_build(sav_data, target_slot=1, target_unit=None, build_key=None, builds_path=None, bump_counter=True):
+    """Equips a unit with an optimal build from the database."""
+    slots = get_slots(sav_data)
+    if target_slot not in slots:
+        raise ValueError(f"Slot {target_slot + 1} not found!")
+
+    builds = load_builds(builds_path)
+    if not builds:
+        print("  [!] Notice: No builds database found. Skipping build equip.")
+        return sav_data
+
+    info = slots[target_slot]
+    secs = info["sectors"]
+    hdr_sec = secs[0]
+    hdr_offset = hdr_sec * SECTOR_SIZE
+
+    equipped_count = 0
+    units_to_process = [target_unit] if target_unit is not None else list(range(24))
+
+    for u in units_to_process:
+        u_addr = hdr_offset + 0x80 + u * 0x108
+        if u_addr + 0x108 > len(sav_data):
+            break
+        level = sav_data[u_addr + 0x09]
+        if level == 0:
+            continue
+
+        race_id = sav_data[u_addr + 0x06]
+        job_id = sav_data[u_addr + 0x07]
+        race_name = RACE_NAMES.get(race_id, "")
+        job_name = JOB_NAMES.get(job_id, ("", ""))[0]
+
+        selected_build = None
+        if build_key and build_key in builds:
+            selected_build = builds[build_key]
+        else:
+            for b_info in builds.values():
+                if (
+                    b_info.get("job", "").lower() == job_name.lower()
+                    and b_info.get("race", "").lower() == race_name.lower()
+                ):
+                    selected_build = b_info
+                    break
+
+        if selected_build and "gear" in selected_build:
+            gear = selected_build["gear"]
+            if len(gear) >= 5:
+                gear_bytes = struct.pack("<5H", *gear[:5])
+                sav_data[u_addr + 0x2A : u_addr + 0x34] = gear_bytes
+                gear_str = ", ".join(selected_build.get("gear_names", [hex(g) for g in gear[:5]]))
+                b_name = selected_build.get("name", "Build")
+                print(f"  [+] Unit {u} ({race_name} {job_name}): Equipped {b_name} [{gear_str}]")
+                equipped_count += 1
+
+    if bump_counter and equipped_count > 0:
+        new_counter = info["counter"] + 1
+        sav_data[hdr_offset + 8 : hdr_offset + 12] = struct.pack("<I", new_counter)
+        new_crc = compute_crc(sav_data, secs)
+        sav_data[hdr_offset + 0x0C : hdr_offset + 0x10] = struct.pack("<I", new_crc)
+        print(f"  [+] Sequence counter incremented to: {new_counter}")
+        print(f"  [+] Checksum updated: {hex(new_crc)}")
+
+    return sav_data
+
+
+def clear_clan_cards(sav_data, target_slot=1, re_equip=True):
     """Zeroes out all red and yellow cards and pardons jailed units in target slot."""
     slots = get_slots(sav_data)
     if target_slot not in slots:
@@ -532,6 +629,10 @@ def clear_clan_cards(sav_data, target_slot=1):
                 sav_data[u_addr + 0x28] &= ~0x08  # Clear In-Jail status bit
                 sav_data[u_addr + 0x101] = 0x00  # Clear remaining sentence counter
                 sav_data[u_addr + 0x104] = 0xFF  # Reset state to free (0xFF)
+                if re_equip:
+                    cur_gear = struct.unpack("<5H", sav_data[u_addr + 0x2A : u_addr + 0x34])
+                    if all(g == 0 for g in cur_gear):
+                        equip_unit_build(sav_data, target_slot=target_slot, target_unit=u, bump_counter=False)
 
     new_counter = info["counter"] + 1
     sav_data[hdr_offset + 8 : hdr_offset + 12] = struct.pack("<I", new_counter)
@@ -740,6 +841,15 @@ Examples:
     )
     parser.set_defaults(auto_backup=default_auto_backup)
     parser.add_argument(
+        "--re-equip",
+        action="store_true",
+        help="Re-equip unit(s) with matching optimal build from builds.toml",
+    )
+    parser.add_argument(
+        "--build",
+        help="Specific build key from builds.toml to equip (e.g. gladiator, paladin, assassin)",
+    )
+    parser.add_argument(
         "-f",
         "--force",
         action="store_true",
@@ -784,7 +894,9 @@ Examples:
     target_slot = args.slot - 1
 
     # Default action: Inspect
-    is_modifying = args.patch_units or args.super_starter or args.clear_cards or args.fix_crc
+    is_modifying = (
+        args.patch_units or args.super_starter or args.clear_cards or args.fix_crc or args.re_equip or args.build
+    )
     if not is_modifying or args.inspect:
         inspect_save(data, show_roster=True)
         if not is_modifying:
@@ -799,6 +911,8 @@ Examples:
             if args.patch_units
             else "clear_cards"
             if args.clear_cards
+            else "re_equip"
+            if (args.re_equip or args.build)
             else "crc_fix"
         )
         b_path = create_snapshot_backup(target_path, action_name, backup_dir=custom_backup_dir)
@@ -820,7 +934,15 @@ Examples:
     if args.clear_cards and not args.patch_units and not args.super_starter:
         data = clear_clan_cards(data, target_slot=target_slot)
 
-    if args.fix_crc and not args.patch_units and not args.super_starter and not args.clear_cards:
+    if (args.re_equip or args.build) and not args.patch_units and not args.super_starter:
+        data = equip_unit_build(
+            data,
+            target_slot=target_slot,
+            target_unit=args.unit,
+            build_key=args.build,
+        )
+
+    if args.fix_crc and not args.patch_units and not args.super_starter and not args.clear_cards and not args.re_equip:
         data = fix_crc(data, target_slot=target_slot)
 
     # Atomic write
