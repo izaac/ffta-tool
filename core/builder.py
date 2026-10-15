@@ -4,6 +4,8 @@ import struct
 
 try:
     from mappings import (
+        ALTERNATE_SECONDARY_A_SETS,
+        ALTERNATE_SECONDARY_JOBS,
         DEFAULT_COMBO_IDS,
         DEFAULT_REACTION_IDS,
         DEFAULT_SECONDARY_A_SETS,
@@ -23,6 +25,8 @@ try:
     )
 except ImportError:
     from ..mappings import (
+        ALTERNATE_SECONDARY_A_SETS,
+        ALTERNATE_SECONDARY_JOBS,
         DEFAULT_COMBO_IDS,
         DEFAULT_REACTION_IDS,
         DEFAULT_SECONDARY_A_SETS,
@@ -280,8 +284,15 @@ def inject_unit(
     ub[0x06] = race_id
     # 0x07: Primary Job ID
     ub[0x07] = job_id
-    # 0x08: Secondary Job ID
-    ub[0x08] = DEFAULT_SECONDARY_JOBS.get(race_id, job_id)
+    # 0x08: Secondary Job ID & 0x36: Secondary A-ability set (fallback to alternate to prevent duplicate skills)
+    def_sec = DEFAULT_SECONDARY_JOBS.get(race_id, job_id)
+    if def_sec == job_id:
+        sec_job_id = ALTERNATE_SECONDARY_JOBS.get(race_id, job_id)
+        sec_a_set = ALTERNATE_SECONDARY_A_SETS.get(race_id, 4)
+    else:
+        sec_job_id = def_sec
+        sec_a_set = DEFAULT_SECONDARY_A_SETS.get(race_id, 4)
+    ub[0x08] = sec_job_id
     # 0x09: Level
     ub[0x09] = level
     # 0x0A:0x0C: EXP = 0
@@ -311,7 +322,7 @@ def inject_unit(
     # 0x35: Primary A-ability set
     ub[0x35] = JOB_PRIMARY_A_SETS.get(job_id, 2)
     # 0x36: Secondary A-ability set
-    ub[0x36] = DEFAULT_SECONDARY_A_SETS.get(race_id, 4)
+    ub[0x36] = sec_a_set
     # 0x3A: Reaction ability
     ub[0x3A] = DEFAULT_REACTION_IDS.get(race_id, 0)
     # 0x3B: Support ability

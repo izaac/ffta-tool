@@ -727,6 +727,29 @@ class TestFftaTool(unittest.TestCase):
             self.assertTrue(all(item > 0 for item in gear), f"Gear items must all be non-zero for {query}")
             self.assertIn("Bangaa", title)
 
+    def test_no_duplicate_secondary_skills(self):
+        """Verifies injecting any job never produces duplicate primary and secondary A-ability sets."""
+        jobs_to_check = [
+            ("hume_fighter", 1, 4, 3, 4, 3),  # Hume Fighter -> Paladin (Set 3)
+            ("bangaa_white_monk", 2, 17, 16, 22, 8),  # Bangaa White Monk -> Gladiator (Set 8)
+            ("viera_sniper", 4, 35, 34, 26, 25),  # Viera Sniper -> Assassin (Set 25)
+            ("moogle_mog_knight", 5, 37, 38, 32, 28),  # Moogle Mog Knight -> Gunner (Set 28)
+        ]
+        buf = bytearray(self.mock_data)
+        for query, _race_id, expected_pjob, expected_sjob, expected_pset, expected_sset in jobs_to_check:
+            patched, _ = inject_unit(buf, build_or_job=query, target_slot=1, target_unit=5)
+            u5_addr = 4 * SECTOR_SIZE + 0x80 + 5 * 0x108
+            p_job = patched[u5_addr + 0x07]
+            s_job = patched[u5_addr + 0x08]
+            p_set = patched[u5_addr + 0x35]
+            s_set = patched[u5_addr + 0x36]
+            self.assertEqual(p_job, expected_pjob, f"Primary job mismatch for {query}")
+            self.assertEqual(s_job, expected_sjob, f"Secondary job mismatch for {query}")
+            self.assertEqual(p_set, expected_pset, f"Primary A-set mismatch for {query}")
+            self.assertEqual(s_set, expected_sset, f"Secondary A-set mismatch for {query}")
+            self.assertNotEqual(p_job, s_job, f"Primary and secondary job cannot be duplicate for {query}")
+            self.assertNotEqual(p_set, s_set, f"Primary and secondary A-sets cannot be duplicate for {query}")
+
     @unittest.skipUnless(
         os.path.exists(
             os.environ.get(
