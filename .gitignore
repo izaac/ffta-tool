@@ -9,3 +9,5 @@ build/
 dist/
 *.egg-info/
 config.toml
+examples/mgba/output/
+*.local.md

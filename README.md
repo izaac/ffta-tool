@@ -12,6 +12,7 @@ Zero external dependencies required. Built with Python 3.10+ standard library.
 - [Save Architecture & Internals](docs/save-architecture.md): Flash wear-leveling, CRC32, and 0x108 unit memory layout.
 - [Analogue Pocket & Handheld Guide](docs/pocket-and-handhelds.md): openFPGA folder layouts and sync best practices.
 - [Support & Diagnostics Suite](support/README.md): Automated save validator, race fleet generator, and Pocket syncer.
+- [mGBA Headless Debugging](docs/mgba_headless_debugging.md): Automated emulation testing, headless Xvfb runner, and save verification.
 
 ---
 

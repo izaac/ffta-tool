@@ -69,3 +69,7 @@ topup:
 # Regenerate all 5 canonical race fleet saves and sync to Pocket
 fleets:
     python3 support/generate_race_save.py all --sync
+
+# Run headless mGBA automated test runner
+mgba-test rom save="examples/FFTA_Super_Starter.sav" out="examples/mgba/output":
+    ./examples/mgba/run_headless_test.sh "{{rom}}" "{{save}}" "{{out}}"
