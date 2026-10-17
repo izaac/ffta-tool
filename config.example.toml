@@ -10,6 +10,10 @@ backup_dir = "~/Documents/FFTA_Backups"
 # Overridden if a save file path is passed directly on the command line.
 # save_file = "~/Documents/FFTA_Backups/Final_Fantasy_Tactics_Advance.sav"
 
+# Optional: Default GBA ROM file for headless mGBA verification tests.
+# Auto-detected across common emulator folders if omitted.
+# rom_file = "~/ROMs/GBA/Final Fantasy Tactics Advance (USA).gba"
+
 # List of glob patterns / paths searched during save auto-detection.
 search_paths = [
     "/run/media/*/*/Saves/GBA/*Final Fantasy Tactics Advance*.sav",

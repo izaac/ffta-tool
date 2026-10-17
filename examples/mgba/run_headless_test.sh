@@ -43,20 +43,77 @@ if [ ${#missing[@]} -gt 0 ]; then
     exit 1
 fi
 
-ROM_PATH="${1:-${ROM_PATH:-}}"
-SAV_PATH="${2:-${SAV_PATH:-${REPO_ROOT}/examples/FFTA_Super_Starter.sav}}"
+# Resolve ROM path: argument -> env -> config.toml -> common search paths
+ROM_PATH="${1:-${FFTA_ROM:-${ROM_PATH:-}}}"
+
+if [ -z "${ROM_PATH}" ]; then
+    for cfg in "${REPO_ROOT}/config.toml" "${XDG_CONFIG_HOME:-$HOME/.config}/ffta-tool/config.toml"; do
+        if [ -f "$cfg" ]; then
+            val=$(grep -E '^\s*rom_file\s*=' "$cfg" | head -1 | cut -d'=' -f2 | tr -d ' "\047' || true)
+            if [ -n "$val" ]; then
+                eval "val=$val"
+                if [ -f "$val" ]; then
+                    ROM_PATH="$val"
+                    break
+                fi
+            fi
+        fi
+    done
+fi
+
+if [ -z "${ROM_PATH}" ]; then
+    for pattern in \
+        "${REPO_ROOT}/*.gba" \
+        "$HOME/Documents/FFTA_Assets/*.gba" \
+        "$HOME/ROMs/GBA/*Final Fantasy Tactics Advance*.gba" \
+        "$HOME/Roms/gba/*Final Fantasy Tactics Advance*.gba" \
+        "$HOME/Emulation/roms/gba/*Final Fantasy Tactics Advance*.gba" \
+        "$HOME/RetroPie/roms/gba/*Final Fantasy Tactics Advance*.gba" \
+        "/run/media/*/*/Games/GBA/*Final Fantasy Tactics Advance*.gba"; do
+        for match in $pattern; do
+            if [ -f "$match" ]; then
+                ROM_PATH="$match"
+                break 2
+            fi
+        done
+    done
+fi
+
+# Resolve SAV path: argument -> env -> config.toml -> repo default
+SAV_PATH="${2:-${FFTA_SAV:-${SAV_PATH:-}}}"
+
+if [ -z "${SAV_PATH}" ]; then
+    for cfg in "${REPO_ROOT}/config.toml" "${XDG_CONFIG_HOME:-$HOME/.config}/ffta-tool/config.toml"; do
+        if [ -f "$cfg" ]; then
+            val=$(grep -E '^\s*save_file\s*=' "$cfg" | head -1 | cut -d'=' -f2 | tr -d ' "\047' || true)
+            if [ -n "$val" ]; then
+                eval "val=$val"
+                if [ -f "$val" ]; then
+                    SAV_PATH="$val"
+                    break
+                fi
+            fi
+        fi
+    done
+fi
+
+if [ -z "${SAV_PATH}" ] || [ ! -f "${SAV_PATH}" ]; then
+    SAV_PATH="${REPO_ROOT}/examples/FFTA_Super_Starter.sav"
+fi
+
 OUTPUT_DIR="${3:-${OUTPUT_DIR:-${SCRIPT_DIR}/output}}"
 
 if [ -z "${ROM_PATH}" ] || [ ! -f "${ROM_PATH}" ]; then
-    echo "Usage: $0 <path_to_ffta_rom.gba> [path_to_save.sav] [output_dir]"
+    echo "Usage: $0 [path_to_ffta_rom.gba] [path_to_save.sav] [output_dir]"
     echo ""
-    echo "Arguments:"
-    echo "  ROM:       Path to clean Final Fantasy Tactics Advance GBA ROM (required)"
-    echo "  SAV:       Path to 64 KiB or 128 KiB .sav file (default: examples/FFTA_Super_Starter.sav)"
-    echo "  OUTPUT:    Directory to store generated screenshots (default: examples/mgba/output)"
+    echo "ROM and Save Resolution:"
+    echo "  1. CLI arguments: $0 <rom> <sav>"
+    echo "  2. Environment variables: FFTA_ROM and FFTA_SAV"
+    echo "  3. Configuration file: [paths] rom_file and save_file in config.toml"
+    echo "  4. Automatic discovery across standard ROM and emulator directories"
+    echo "  5. Default save fallback: examples/FFTA_Super_Starter.sav"
     echo ""
-    echo "Environment Variables (optional overrides):"
-    echo "  MGBA_BIN, XDOTOOL_BIN, XVFB_BIN, MAGICK_BIN, IMPORT_BIN"
+    echo "[!] Error: No FFTA GBA ROM found. Please specify ROM path or set FFTA_ROM / rom_file." >&2
     exit 1
 fi
 

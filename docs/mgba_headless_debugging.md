@@ -88,22 +88,36 @@ The automated runner interfaces with mGBA's default SDL input mapping:
 Use the automated test runner script located at `examples/mgba/run_headless_test.sh`:
 
 ```bash
-./examples/mgba/run_headless_test.sh <path_to_rom.gba> [path_to_save.sav] [output_dir]
+./examples/mgba/run_headless_test.sh [path_to_rom.gba] [path_to_save.sav] [output_dir]
 ```
 
-Or run via `just`:
+Or run via `just` (which auto-detects ROM and save when omitted):
 
 ```bash
-just mgba-test path/to/rom.gba
+just mgba-test
 ```
 
-### Parameters
+### ROM & Save Resolution Order
 
-- `<path_to_rom.gba>`: Path to a clean North American or European FFTA GBA ROM (required).
-- `[path_to_save.sav]`: Path to the 64 KiB or 128 KiB `.sav` file to verify (optional;
-  defaults to `examples/FFTA_Super_Starter.sav`).
-- `[output_dir]`: Output directory for generated PNG screenshots (optional; defaults to
-  `examples/mgba/output`).
+The test runner is designed to be fully portable across different machines and directory
+structures without requiring code modifications:
+
+1. **Explicit Arguments**: Passed directly via command line (`$1` = ROM, `$2` = SAV).
+2. **Environment Variables**:
+   - `FFTA_ROM` / `ROM_PATH`: Path to FFTA GBA ROM.
+   - `FFTA_SAV` / `SAV_PATH`: Path to save file.
+3. **Configuration File**: Defined in `config.toml` (or `~/.config/ffta-tool/config.toml`):
+
+   ```toml
+   [paths]
+   rom_file = "~/ROMs/GBA/Final Fantasy Tactics Advance (USA).gba"
+   save_file = "~/Documents/FFTA_Backups/Final_Fantasy_Tactics_Advance.sav"
+   ```
+
+4. **Auto-Discovery**: If omitted, the runner searches common ROM and emulator folders
+   (`~/Documents/FFTA_Assets/`, `~/ROMs/GBA/`, `~/Emulation/roms/gba/`, `~/RetroPie/roms/gba/`).
+5. **Default Save Fallback**: If no save file is supplied, the runner automatically uses
+   `examples/FFTA_Super_Starter.sav` bundled inside the repository.
 
 ### Environment Variable Overrides
 

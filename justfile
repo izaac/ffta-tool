@@ -70,6 +70,6 @@ topup:
 fleets:
     python3 support/generate_race_save.py all --sync
 
-# Run headless mGBA automated test runner
-mgba-test rom save="examples/FFTA_Super_Starter.sav" out="examples/mgba/output":
+# Run headless mGBA automated test runner (auto-detects ROM & save if omitted)
+mgba-test rom="" save="" out="examples/mgba/output":
     ./examples/mgba/run_headless_test.sh "{{rom}}" "{{save}}" "{{out}}"
